@@ -25,6 +25,8 @@ class SuscriptionController extends Controller
 
         $total_suscriptions = Suscription::all()->count();
 
+        // return $suscriptions;
+
         return inertia('Suscription/Index', compact('sellers', 'total_suscriptions', 'suscriptions'));
     }
 
