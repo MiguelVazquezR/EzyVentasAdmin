@@ -4,13 +4,11 @@
             <thead>
                 <tr class="*:text-left *:pb-2 *:px-4 *:text-sm">
                     <th>ID</th>
-                    <th>Nombre de la tienda</th>
-                    <th>Contacto</th>
+                    <th>Nombre</th>
+                    <th>Rol</th>
+                    <th>Fecha de ingreso</th>
                     <th>Correo</th>
-                    <th>Suscrito desde</th>
-                    <th>Tipo de suscripción</th>
-                    <th>Próximo pago</th>
-                    <th>Vendedor</th>
+                    <th>Teléfono</th>
                 </tr>
             </thead>
             <tbody>
@@ -18,19 +16,10 @@
                     class="*:text-xs *:py-2 *:px-4 hover:bg-primarylight cursor-pointer">
                     <td class="rounded-s-full">{{ item.id }}</td>
                     <td>{{ item.name }}</td>
-                    <td>{{ item.contact_name }}</td>
-                    <td>{{ item.user?.email }}</td>
+                    <td>{{ item.employee_propertie?.rol ?? '-' }}</td>
                     <td>{{ formatDateTime(item.created_at) }}</td>
-                    <td>{{ item.suscription_period }}</td>
-                    <td>
-                        <div class="flex items-center space-x-2">
-                            <el-tooltip :content="item.status" placement="left">
-                                <i class="fa-solid fa-circle text-[8px]" :style="{ color: statuses[item.status] }"></i>
-                            </el-tooltip>
-                            <span>{{ formatDateTime(item.next_payment) }}</span>
-                        </div>
-                    </td>
-                    <td>{{ item.seller?.name }}</td>
+                    <td>{{ item.email }}</td>
+                    <td>{{ item.phone }}</td>
                     <td class="rounded-e-full text-end">
                         <el-dropdown trigger="click" @command="handleCommand">
                             <button @click.stop
@@ -77,10 +66,10 @@
 
     <ConfirmationModal :show="showDeleteConfirm" @close="showDeleteConfirm = false">
         <template #title>
-            <h1>Eliminar suscripción</h1>
+            <h1>Eliminar usuario</h1>
         </template>
         <template #content>
-            <p>Se eliminará la suscripción y todo lo relacionado a la misma. Es un proceso irreversible. ¿Continuar de
+            <p>Se eliminará la usuario y todo lo relacionado al mismo en un proceso irreversible. ¿Continuar de
                 todas formas?</p>
         </template>
         <template #footer>
@@ -103,11 +92,6 @@ export default {
         return {
             showDeleteConfirm: false,
             itemIdToDelete: null,
-            statuses: {
-                'Pagado': '#59E304',
-                'Próximo a vencer': '#F68C0F',
-                'Vencido': '#F32C2C',
-            },
         };
     },
     components: {
@@ -129,9 +113,9 @@ export default {
             const itemId = command.split('-')[1];
 
             if (commandName == 'see') {
-                this.$inertia.get(route('suscriptions.show', itemId));
+                this.$inertia.get(route('admins.show', itemId));
             } else if (commandName == 'edit') {
-                this.$inertia.get(route('suscriptions.edit', itemId));
+                this.$inertia.get(route('admins.edit', itemId));
             } else if (commandName == 'delete') {
                 this.showDeleteConfirm = true;
                 this.itemIdToDelete = itemId;

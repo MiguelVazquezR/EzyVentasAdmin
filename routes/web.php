@@ -47,6 +47,8 @@ Route::resource('admins', AdminController::class)->middleware('web');
 Route::get('admins-get-notifications', [AdminController::class, 'getNotifications'])->middleware('auth')->name('admins.get-notifications');
 Route::post('admins-read-notifications', [AdminController::class, 'readNotifications'])->middleware('auth')->name('admins.read-user-notifications');
 Route::post('admins-delete-notifications', [AdminController::class, 'deleteNotifications'])->middleware('auth')->name('admins.delete-user-notifications');
+Route::get('admins-get-by-page/{currentPage}', [AdminController::class, 'getItemsByPage'])->name('admins.get-by-page')->middleware('auth');
+Route::get('admins-get-matches/{query}', [AdminController::class, 'getMatches'])->name('admins.get-matches');
 
 
 // suscriptions routes-----------------------------------------------------------------------------------------
