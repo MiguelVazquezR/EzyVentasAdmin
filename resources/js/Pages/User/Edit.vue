@@ -1,15 +1,17 @@
 <template>
-    <AppLayout title="Nuevo usuario">
+    <AppLayout title="Editar usuario">
         <div class="px-10 py-7">
             <Back />
 
-            <form @submit.prevent="store"
+            <form @submit.prevent="update"
                 class="rounded-lg border border-grayD9 lg:p-5 p-3 lg:w-1/2 mx-auto mt-7 lg:grid lg:grid-cols-2 gap-x-3">
-                <h1 class="font-bold ml-2 col-span-full">Nuevo usuario</h1>
+                <h1 class="font-bold ml-2 col-span-full">Editar usuario</h1>
 
                 <div class="col-span-full my-4">
                     <InputLabel value="Foto del usuario" class="ml-3 mb-1" />
-                    <InputFilePreview @imagen="saveImage" @cleared="form.userImage = null" />
+                    <InputFilePreview @imagen="saveImage($event); form.userImageCleared = false" 
+                        @cleared="form.userImage = null; form.userImageCleared = true"
+                        :imageUrl="user.media[0]?.original_url" />
                 </div>
 
                 <div class="mt-3">
@@ -43,7 +45,7 @@
                 <div class="mt-5 col-span-full">
                     <InputLabel value="Estatus*" class="ml-3 mb-1" />
                     <el-radio-group v-model="form.is_active" class="ml-4">
-                        <el-radio :value="true" size="large">Activo</el-radio>
+                        <el-radio @click="cleanDisabledInputs" :value="true" size="large">Activo</el-radio>
                         <el-radio :value="false" size="large">Inactivo</el-radio>
                     </el-radio-group>
                 </div>
@@ -62,7 +64,7 @@
                 </div>
 
                 <div class="col-span-2 text-right mt-3">
-                    <PrimaryButton class="!rounded-full" :disabled="form.processing">Crear usuario</PrimaryButton>
+                    <PrimaryButton class="!rounded-full" :disabled="form.processing">Guardar cambios</PrimaryButton>
                 </div>
             </form>
         </div>
@@ -81,14 +83,15 @@ import { useForm } from "@inertiajs/vue3";
 export default {
 data() {
     const form = useForm({
-        name: null,
-        created_at: null,
-        email: null,
-        phone: null,
-        is_active: true,
-        disabled_date: null,
-        disabled_reason: null,
+        name: this.user.name,
+        created_at: this.user.created_at,
+        email: this.user.email,
+        phone: this.user.phone,
+        is_active: !! this.user.is_active,
+        disabled_date: this.user.disabled_date,
+        disabled_reason: this.user.disabled_reason,
         userImage: null,
+        userImageCleared: false,
     });
 
     return {
@@ -104,19 +107,36 @@ InputError,
 Back
 },
 props:{
-
+user: Object
 },
 methods:{
-    store() {
-        this.form.post(route("admins.store"), {
-            onSuccess: () => {
-                this.$notify({
+    update() {
+        if (this.form.userImage) {
+            this.form.post(route("admins.update-with-media", this.user.id), {
+                method: '_put',
+                onSuccess: () => {
+                    this.$notify({
                     title: "Correcto",
-                    message: "Se ha agregado un nuevo usuario",
+                    message: "Se ha editado el usuario",
                     type: "success",
                 });
-            },
-        });
+                },
+            });
+        } else {
+            this.form.put(route("admins.update", this.user.id), {
+                onSuccess: () => {
+                    this.$notify({
+                    title: "Correcto",
+                    message: "Se ha editado el usuario",
+                    type: "success",
+                });
+                },
+            });
+        }
+    },
+    cleanDisabledInputs() {
+        this.form.disabled_date = null;
+        this.form.disabled_reason = null;
     },
     disabledDate(time) {
       const today = new Date();

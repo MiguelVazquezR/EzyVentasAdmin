@@ -17,7 +17,7 @@
                 <el-tag v-if="search" class="mt-2 lg:mt-0" size="large" closable @close="handleTagClose">
                     Estas buscando: <b>{{ search }}</b>
                 </el-tag>
-                <PrimaryButton @click="$inertia.get('admins.create')">Nuevo uruario</PrimaryButton>
+                <PrimaryButton @click="$inertia.get(route('admins.create'))">Nuevo uruario</PrimaryButton>
             </section>
 
             <Loading v-if="loading" class="mt-20" />

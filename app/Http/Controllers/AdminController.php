@@ -27,7 +27,23 @@ class AdminController extends Controller
     
     public function store(Request $request)
     {
-       //
+       $request->validate([
+        'name' => 'required|string|max:100',
+        'phone' => 'required|string|min:10|max:10',
+        'email' => 'required|unique:admins,email',
+        'disabled_date' => $request->is_active ? 'nullable' : 'required|date',
+        'disabled_reason' => $request->is_active ? 'nullable' : 'required|string|max:255',
+        'created_at' => 'required|date',
+       ]);
+
+       $user = Admin::create($request->except('userImage') + ['password' => bcrypt('ezyventas')]);
+
+       // Guardar el archivo en la colección 'userImage'
+       if ($request->hasFile('userImage')) {
+            $user->addMediaFromRequest('userImage')->toMediaCollection('userImage');
+        }
+
+        return to_route('admins.index');
     }
 
     
@@ -37,15 +53,63 @@ class AdminController extends Controller
     }
 
     
-    public function edit(Admin $admin)
+    public function edit($admin_id)
     {
-        //
+        $user = Admin::with('media')->find($admin_id);
+
+        // return $user;
+        return inertia('User/Edit', compact('user'));
     }
 
     
     public function update(Request $request, Admin $admin)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:100',
+            'phone' => 'required|string|min:10|max:10',
+            'email' => 'required|unique:admins,email,' .$admin->id,
+            'disabled_date' => $request->is_active ? 'nullable' : 'required|date',
+            'disabled_reason' => $request->is_active ? 'nullable' : 'required|string|max:255',
+            'created_at' => 'required|date',
+        ]);
+
+        $admin->update($request->except('userImage'));
+
+         // media
+        // Eliminar imagen sólo si se borró desde el input y no se agregó una nueva
+        if ($request->userImageCleared) {
+            $admin->clearMediaCollection('userImage');
+        }
+
+        return to_route('admins.index');
+    }
+
+
+    public function updateWithMedia(Request $request, Admin $admin)
+    {
+        $request->validate([
+            'name' => 'required|string|max:100',
+            'phone' => 'required|string|min:10|max:10',
+            'email' => 'required|unique:admins,email,' .$admin->id,
+            'disabled_date' => $request->is_active ? 'nullable' : 'required|date',
+            'disabled_reason' => $request->is_active ? 'nullable' : 'required|string|max:255',
+            'created_at' => 'required|date',
+        ]);
+
+        $admin->update($request->except('userImage'));
+
+        // media ------------
+        // Eliminar imágenes antiguas solo si se proporcionan nuevas imágenes
+        if ($request->hasFile('userImage')) {
+            $admin->clearMediaCollection('userImage');
+        }
+
+        // Guardar el archivo en la colección 'userImage'
+        if ($request->hasFile('userImage')) {
+            $admin->addMediaFromRequest('userImage')->toMediaCollection('userImage');
+        }
+
+        return to_route('admins.index');
     }
 
     

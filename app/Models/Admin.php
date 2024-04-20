@@ -10,14 +10,18 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Admin extends Authenticatable
+class Admin extends Authenticatable implements HasMedia
 {
     use HasApiTokens;
     use HasFactory;
     use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
+    use InteractsWithMedia;
+    
 
     /**
      * The attributes that are mass assignable.
@@ -28,6 +32,11 @@ class Admin extends Authenticatable
         'name',
         'email',
         'password',
+        'phone',
+        'is_active',
+        'employee_properties',
+        'disabled_date',
+        'disabled_reason',
     ];
 
     /**
@@ -49,6 +58,8 @@ class Admin extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'disabled_date' => 'date',
+        'employee_properties' => 'array',
     ];
 
     /**
