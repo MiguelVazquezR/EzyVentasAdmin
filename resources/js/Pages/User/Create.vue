@@ -1,6 +1,6 @@
 <template>
     <AppLayout title="Nuevo usuario">
-        <div class="px-10 py-7">
+        <div class="px-4 md:px-10 py-7">
             <Back />
 
             <form @submit.prevent="store"

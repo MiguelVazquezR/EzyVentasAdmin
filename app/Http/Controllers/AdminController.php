@@ -47,15 +47,18 @@ class AdminController extends Controller
     }
 
     
-    public function show(Admin $admin)
+    public function show($admin_id)
     {
-        //
+        $user = Admin::with(['media', 'stores'])->find($admin_id);
+
+        // return $user;
+        return inertia('User/Show', compact('user'));
     }
 
     
     public function edit($admin_id)
     {
-        $user = Admin::with('media')->find($admin_id);
+        $user = Admin::with(['media'])->find($admin_id);
 
         // return $user;
         return inertia('User/Edit', compact('user'));
@@ -115,7 +118,9 @@ class AdminController extends Controller
     
     public function destroy(Admin $admin)
     {
-        //
+        $admin->delete();
+
+        return to_route('admins.index');
     }
 
 

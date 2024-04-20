@@ -12,7 +12,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr @click="$inertia.visit(route('suscriptions.show', item))" v-for="item in items" :key="item.id"
+                <tr @click="$inertia.visit(route('admins.show', item))" v-for="item in items" :key="item.id"
                     class="*:text-xs *:py-2 *:px-4 hover:bg-primarylight cursor-pointer">
                     <td class="rounded-s-full">{{ item.id }}</td>
                     <td>{{ item.name }}</td>
