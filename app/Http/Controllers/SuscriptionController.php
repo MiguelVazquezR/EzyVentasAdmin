@@ -26,7 +26,6 @@ class SuscriptionController extends Controller
         $total_suscriptions = Suscription::all()->count();
 
         // return $suscriptions;
-
         return inertia('Suscription/Index', compact('sellers', 'total_suscriptions', 'suscriptions'));
     }
 
@@ -40,9 +39,13 @@ class SuscriptionController extends Controller
         //
     }
 
-    public function show(Suscription $suscription)
-    {
-        return inertia('Suscription/Show', compact('suscription'));
+    public function show($suscription_id)
+    {   
+        $suscription = Suscription::with(['seller', 'payments'])->find($suscription_id);
+        $suscriptions = Suscription::latest()->get(['id', 'name']);
+
+        // return $suscription;
+        return inertia('Suscription/Show', compact('suscription', 'suscriptions'));
     }
 
     public function edit(Suscription $suscription)
@@ -57,7 +60,7 @@ class SuscriptionController extends Controller
 
     public function destroy(Suscription $suscription)
     {
-        //
+        $suscription->delete();
     }
 
     public function getMatches($query)

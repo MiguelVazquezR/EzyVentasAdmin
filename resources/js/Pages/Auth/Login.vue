@@ -53,6 +53,7 @@ const submit = () => {
         </div>
 
         <form @submit.prevent="submit">
+
             <div>
                 <div
                     class="flex items-center space-x-2 py-2 px-5 w-full h-10 border border-grayD9 rounded-full placeholder:text-sm placeholder:text-[#777777]">
@@ -67,6 +68,7 @@ const submit = () => {
                 </div>
                 <InputError :message="form.errors.email" />
             </div>
+            
             <div>
                 <div
                     class="mt-3 flex items-center space-x-2 py-2 px-5 w-full h-10 border border-grayD9 rounded-full placeholder:text-sm placeholder:text-[#777777]">

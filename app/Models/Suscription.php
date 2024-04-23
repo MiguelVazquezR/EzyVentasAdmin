@@ -38,6 +38,11 @@ class Suscription extends Model
     {
         return $this->hasOne(User::class, 'store_id', 'id');
     }
+
+    public function payments() :HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
     
     public function seller(): BelongsTo
     {

@@ -74,6 +74,6 @@ class Admin extends Authenticatable implements HasMedia
     //relationships
     public function stores() :HasMany
     {
-        return $this->hasMany(Store::class);
+        return $this->hasMany(Store::class, 'seller_id', 'id');
     }
 }

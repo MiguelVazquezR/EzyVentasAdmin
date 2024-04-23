@@ -11,7 +11,7 @@
                 <td class="w-36">Último pago</td>
                 <td class="w-32">Estatus</td>
             </tr>
-            <tr class="*:px-2" v-for="store in stores" :key="store">
+            <tr class="*:px-2 cursor-default hover:text-primary" v-for="store in stores" :key="store">
                 <td>{{ store.id }}</td>
                 <td :title="store.name" class="w-40 truncate">{{ store.name }}</td>
                 <td :title="store.contact_name" class="w-40 truncate">{{ store.contact_name }}</td>
