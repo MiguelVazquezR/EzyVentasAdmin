@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="items.length">
         <table class="w-full">
             <thead>
                 <tr class="*:text-left *:pb-2 *:px-4 *:text-sm">
@@ -63,6 +63,7 @@
             </tbody>
         </table>
     </div>
+    <el-empty v-else description="No hay usuarios para mostrar" />
 
     <ConfirmationModal :show="showDeleteConfirm" @close="showDeleteConfirm = false">
         <template #title>
@@ -121,6 +122,30 @@ export default {
                 this.itemIdToDelete = itemId;
             }
         },
+        async deleteItem() {
+            try {
+                const response = await axios.delete(route('admins.destroy', this.itemIdToDelete));
+                if (response.status === 200) {
+                    this.$notify({
+                        title: "Éxito",
+                        message: "Se ha eliminado al usuario",
+                        type: "success",
+                    });
+                    const deletedItemIndex = this.items.findIndex(item => item.id == this.itemIdToDelete);
+                    if (deletedItemIndex !== -1) {
+                        this.items.splice(deletedItemIndex, 1);
+                    }
+                    this.showDeleteConfirm = false;
+                }
+            } catch (error) {
+                console.log(error);
+                this.$notify({
+                    title: "Error",
+                    message: "No se pudo eliminar al usuario. Intenta más tarde",
+                    type: "error",
+                });
+            }
+        }
     },
 }
 </script>

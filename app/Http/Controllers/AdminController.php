@@ -119,8 +119,6 @@ class AdminController extends Controller
     public function destroy(Admin $admin)
     {
         $admin->delete();
-
-        return to_route('admins.index');
     }
 
 

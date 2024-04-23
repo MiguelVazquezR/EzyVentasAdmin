@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="items.length">
         <table class="w-full">
             <thead>
                 <tr class="*:text-left *:pb-2 *:px-4 *:text-sm">
@@ -74,6 +74,7 @@
             </tbody>
         </table>
     </div>
+    <el-empty v-else description="No hay suscriptores para mostrar" />
 
     <ConfirmationModal :show="showDeleteConfirm" @close="showDeleteConfirm = false">
         <template #title>
@@ -97,6 +98,7 @@ import DangerButton from "@/Components/DangerButton.vue";
 import CancelButton from "@/Components/MyComponents/CancelButton.vue";
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import axios from 'axios';
 
 export default {
     data() {
@@ -137,6 +139,30 @@ export default {
                 this.itemIdToDelete = itemId;
             }
         },
+        async deleteItem() {
+            try {
+                const response = await axios.delete(route('suscriptions.destroy', this.itemIdToDelete));
+                if (response.status === 200) {
+                    this.$notify({
+                        title: "Éxito",
+                        message: "Se ha eliminado al suscriptor",
+                        type: "success",
+                    });
+                    const deletedItemIndex = this.items.findIndex(item => item.id == this.itemIdToDelete);
+                    if (deletedItemIndex !== -1) {
+                        this.items.splice(deletedItemIndex, 1);
+                    }
+                    this.showDeleteConfirm = false;
+                }
+            } catch (error) {
+                console.log(error);
+                this.$notify({
+                    title: "Error",
+                    message: "No se pudo eliminar al suscriptor. Intenta más tarde",
+                    type: "error",
+                });
+            }
+        }
     },
 }
 </script>

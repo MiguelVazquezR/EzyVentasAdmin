@@ -22,6 +22,7 @@ class Store extends Model
         'next_payment',
         'suscription_period',
         'default_card_id',
+        'seller_id',
     ];
 
     protected $casts = [

@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GlobalProductController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\SuscriptionController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -78,3 +79,8 @@ Route::resource('categories', CategoryController::class)->middleware('auth');
 //brands routes------------------------------------------------------------------------------------------  
 //-------------------------------------------------------------------------------------------------------
 Route::resource('brands', BrandController::class)->middleware('auth');
+
+
+//Payments routes------------------------------------------------------------------------------------------  
+//---------------------------------------------------------------------------------------------------------
+Route::resource('payments', PaymentController::class)->middleware('auth');
