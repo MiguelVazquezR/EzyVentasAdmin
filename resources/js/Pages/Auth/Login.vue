@@ -33,12 +33,20 @@ const submit = () => {
 </script>
 
 <template>
+
     <Head title="Log in" />
 
     <AuthenticationCard>
         <template #logo>
             <AuthenticationCardLogo />
+            <h1 class="font-extrabold mt-3 text-center text-2xl text-primary">VentaProX</h1>
         </template>
+
+        <div class="flex items-center justify-around mt-5 mb-8 mx-11 border-b text-sm">
+            <span class="text-primary px-2 border-b border-primary">Iniciar sesión</span>
+            <!-- <button @click="$inertia.visit(route('register'))" type="button"
+                class="text-[#777777] px-2">Registrarse</button> -->
+        </div>
 
         <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
             {{ status }}
@@ -60,7 +68,7 @@ const submit = () => {
                 </div>
                 <InputError :message="form.errors.email" />
             </div>
-
+            
             <div>
                 <div
                     class="mt-3 flex items-center space-x-2 py-2 px-5 w-full h-10 border border-grayD9 rounded-full placeholder:text-sm placeholder:text-[#777777]">
@@ -104,6 +112,17 @@ const submit = () => {
                 <PrimaryButton class="w-full" :disabled="form.processing">
                     Ingresar
                 </PrimaryButton>
+            </div>
+
+            <el-divider class="mt-4">ó</el-divider>
+
+            <div class="flex items-center justify-center mt-4">
+                <button
+                    class="w-full border border-grayD9 rounded-full flex items-center justify-center space-x-3 py-1 text-sm text-[#777777] disabled:opacity-25 disabled:cursor-not-allowed"
+                    :disabled="form.processing">
+                    <img src="@/../../public/images/google_logo.png" width="25" alt="Logo de google">
+                    <span>Continuar con Google</span>
+                </button>
             </div>
         </form>
     </AuthenticationCard>
