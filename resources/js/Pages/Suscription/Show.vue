@@ -1,10 +1,10 @@
 <template>
     <AppLayout title="Detalles de suscripción">
-        <div class="px-12 py-5">
+        <div class="px-3 lg:px-12 py-5">
             <p class="font-bold">Detalles de la suscripción</p>
 
             <!-- selector de suscriptor -->
-            <div class="mt-2 flex justify-between">
+            <div class="mt-2 flex justify-between space-x-4">
                 <el-select @change="$inertia.get(route('suscriptions.show', suscription_id))" v-model="suscription_id" clearable
                     placeholder="Seleccione" no-data-text="No hay opciones registradas"
                     no-match-text="No se encontraron coincidencias" class="md:!w-1/3">

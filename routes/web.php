@@ -5,6 +5,7 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GlobalProductController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\SupportReportController;
 use App\Http\Controllers\SuscriptionController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -84,3 +85,13 @@ Route::resource('brands', BrandController::class)->middleware('auth');
 //Payments routes------------------------------------------------------------------------------------------  
 //---------------------------------------------------------------------------------------------------------
 Route::resource('payments', PaymentController::class)->middleware('auth');
+
+
+//support-reports routes------------------------------------------------------------------------------------------  
+//---------------------------------------------------------------------------------------------------------
+Route::resource('support-reports', SupportReportController::class)->middleware('auth');
+Route::get('support-reports-get-by-page/{currentPage}', [SupportReportController::class, 'getItemsByPage'])->name('support-reports.get-by-page')->middleware('auth');
+Route::get('support-reports-get-matches/{query}', [SupportReportController::class, 'getMatches'])->name('support-reports.get-matches');
+Route::get('support-reports-get-matches/{query}', [SupportReportController::class, 'getMatches'])->name('support-reports.get-matches');
+Route::put('support-reports-change-status/{support_report}/{status}', [SupportReportController::class, 'changeStatus'])->name('support-reports.change-status');
+Route::get('support-reports-get-by-page/{currentPage}', [SupportReportController::class, 'getItemsByPage'])->name('support-reports.get-by-page')->middleware('auth');
