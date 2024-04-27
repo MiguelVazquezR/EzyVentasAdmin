@@ -4,6 +4,8 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -27,6 +29,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'employee_properties',
+        'store_id',
     ];
 
     /**
@@ -48,6 +52,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'employee_properties' => 'array',
     ];
 
     /**
@@ -58,4 +63,11 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
     ];
+
+    //relationships
+    public function store() :BelongsTo
+    {
+        return $this->belongsTo(Store::class);
+    }
+
 }
