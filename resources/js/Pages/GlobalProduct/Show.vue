@@ -19,7 +19,7 @@
             </div>
 
             <div class="mt-5">
-                <Back :route="'products.index'" />
+                <Back :route="'global-products.index'" />
             </div>
 
             <!-- Info de producto -->
@@ -27,7 +27,7 @@
                 <!-- fotografia de producto -->
                 <section class="mt-7">
                     <figure class="border border-grayD9 rounded-lg">
-                        <img class="size-60 lg:size-96 mx-auto object-contain" :src="global_product.media[0]?.original_url" alt="">
+                        <img class="size-60 lg:size-96 mx-auto object-contain" :src="procesarUrlImagen(global_product.media[0]?.original_url)" alt="">
                     </figure>
                 </section>
 
@@ -134,6 +134,13 @@ methods:{
         },
         formatDate(dateString) {
             return format(parseISO(dateString), 'dd MMMM yyyy', { locale: es });
+        },
+        // Método para procesar la URL de la imagen manda a la ruta de la app.
+        procesarUrlImagen(originalUrl) {
+            // Reemplaza la parte inicial de la URL
+            const nuevaUrl = originalUrl.replace('https://admin.ezyventas.com/', 'https://ezyventas.com/');
+            // const nuevaUrl = originalUrl.replace('http://localhost:8000', 'https://ezyventas.com/'); //para hacer pruebas en local
+            return nuevaUrl;
         },
 }
 }
