@@ -32,7 +32,7 @@ class SupportReportController extends Controller
     
     public function show($support_report_id)
     {
-        $support_report = SupportReport::with(['store' => ['seller']])->find($support_report_id);
+        $support_report = SupportReport::with(['media', 'store' => ['seller']])->find($support_report_id);
 
         // return $support_report;
         return inertia('SupportReport/Show', compact('support_report'));

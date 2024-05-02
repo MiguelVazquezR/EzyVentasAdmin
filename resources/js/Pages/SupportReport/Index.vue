@@ -31,7 +31,7 @@
                         total_reports }}
                     elementos
                 </p>
-                <SuscriptionsTable :items="localReports" />
+                <ReportsTable :items="localReports" />
                 <p v-if="localReports.length" class="text-gray66 text-[11px] mt-1">{{ localReports.length }}
                     de {{
                         total_reports }}
@@ -54,7 +54,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import InputLabel from "@/Components/InputLabel.vue";
 import Loading from '@/Components/MyComponents/Loading.vue';
-import SuscriptionsTable from '@/Components/MyComponents/Suscription/SuscriptionsTable.vue';
+import ReportsTable from '@/Components/MyComponents/SupportReport/ReportsTable.vue';
 import axios from 'axios';
 
 export default {
@@ -113,7 +113,7 @@ export default {
     },
     components: {
         AppLayout,
-        SuscriptionsTable,
+        ReportsTable,
         PrimaryButton,
         InputLabel,
         Loading,
