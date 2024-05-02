@@ -1,6 +1,6 @@
 <template>
     <section v-if="item.payments?.length" class="mt-7 text-sm w-full overflow-auto">
-        <table>
+        <table class="w-full">
             <tr class="font-bold *:pb-3 *:px-2">
                 <td class="w-40">Fecha de pago</td>
                 <td class="w-40 truncate">Tipo de suscripción</td>
@@ -19,7 +19,7 @@
             </tr>
         </table>
     </section>
-    <p class="text-sm text-center text-gray-400 mt-5" v-else>No hay pagos registrados</p>
+    <el-empty v-else description="No hay pagos registrados" :image-size="90" />
 </template>
 
 <script>
