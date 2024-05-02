@@ -20,12 +20,11 @@ class SuscriptionController extends Controller
 
         $suscriptions = Suscription::latest('id')
             ->with(['user', 'seller'])
-            ->take(10)
-            ->get();
+            ->get()
+            ->take(30);
 
         $total_suscriptions = Suscription::all()->count();
 
-        // return $suscriptions;
         return inertia('Suscription/Index', compact('sellers', 'total_suscriptions', 'suscriptions'));
     }
 
@@ -87,13 +86,13 @@ class SuscriptionController extends Controller
 
     public function getItemsByPage($currentPage)
     {
-        $offset = $currentPage * 10;
+        $offset = $currentPage * 30;
 
         $suscriptions = Suscription::latest('id')
             ->with(['user', 'seller'])
+            ->get()
             ->skip($offset)
-            ->take(10)
-            ->get();
+            ->take(30);
 
         return response()->json(['items' => $suscriptions]);
     }
