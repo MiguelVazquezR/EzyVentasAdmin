@@ -6,30 +6,11 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GlobalProductController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\SupportReportController;
-use App\Http\Controllers\SuscriptionController;
+use App\Http\Controllers\StoreController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
-
-// Route::get('/', function () {
-//     return Inertia::render('Welcome', [
-//         'canLogin' => Route::has('login'),
-//         'canRegister' => Route::has('register'),
-//         'laravelVersion' => Application::VERSION,
-//         'phpVersion' => PHP_VERSION,
-//     ]);
-// });
 
 Route::redirect('/', 'login');
 
@@ -54,12 +35,12 @@ Route::get('admins-get-matches/{query}', [AdminController::class, 'getMatches'])
 Route::post('admins/update-with-media/{admin}', [AdminController::class, 'updateWithMedia'])->name('admins.update-with-media')->middleware('auth');
 
 
-// suscriptions routes-----------------------------------------------------------------------------------------
+// stores routes-----------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------
-Route::resource('suscriptions', SuscriptionController::class)->middleware('web');
-Route::get('suscriptions-get-by-page/{currentPage}', [SuscriptionController::class, 'getItemsByPage'])->name('suscriptions.get-by-page')->middleware('auth');
-Route::get('suscriptions-get-matches/{query}', [SuscriptionController::class, 'getMatches'])->name('suscriptions.get-matches');
-Route::get('suscriptions-get-filters/{prop}/{value}', [SuscriptionController::class, 'getFilters'])->name('suscriptions.get-filters');
+Route::resource('stores', StoreController::class)->middleware('web');
+Route::get('stores-get-by-page/{currentPage}', [StoreController::class, 'getItemsByPage'])->name('stores.get-by-page')->middleware('auth');
+Route::get('stores-get-matches/{query}', [StoreController::class, 'getMatches'])->name('stores.get-matches');
+Route::get('stores-get-filters/{prop}/{value}', [StoreController::class, 'getFilters'])->name('stores.get-filters');
 
 
 //Global products routes (Catálgo base)----------------------------------------------------------------------------------
@@ -85,6 +66,7 @@ Route::resource('brands', BrandController::class)->middleware('auth');
 //Payments routes------------------------------------------------------------------------------------------  
 //---------------------------------------------------------------------------------------------------------
 Route::resource('payments', PaymentController::class)->middleware('auth');
+Route::put('payments/update-status/{payment}', [PaymentController::class, 'updateStatus'])->name('payments.update-status')->middleware('auth');
 
 
 //support-reports routes------------------------------------------------------------------------------------------  

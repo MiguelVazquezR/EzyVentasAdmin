@@ -14,7 +14,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr @click="$inertia.visit(route('suscriptions.show', item))" v-for="item in items" :key="item.id"
+                <tr @click="$inertia.visit(route('stores.show', item))" v-for="item in items" :key="item.id"
                     class="*:text-xs *:py-2 *:px-4 hover:bg-primarylight cursor-pointer">
                     <td class="rounded-s-full">{{ item.id }}</td>
                     <td>{{ item.name }}</td>
@@ -129,9 +129,9 @@ export default {
             const itemId = command.split('-')[1];
 
             if (commandName == 'see') {
-                this.$inertia.get(route('suscriptions.show', itemId));
+                this.$inertia.get(route('stores.show', itemId));
             } else if (commandName == 'edit') {
-                this.$inertia.get(route('suscriptions.edit', itemId));
+                this.$inertia.get(route('stores.edit', itemId));
             } else if (commandName == 'delete') {
                 this.showDeleteConfirm = true;
                 this.itemIdToDelete = itemId;

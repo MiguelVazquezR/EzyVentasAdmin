@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Store extends Model
 {
@@ -20,9 +21,10 @@ class Store extends Model
         'plan',
         'is_active',
         'next_payment',
+        'status',
+        'seller_id',
         'suscription_period',
         'default_card_id',
-        'seller_id',
     ];
 
     protected $casts = [
@@ -30,7 +32,17 @@ class Store extends Model
     ];
 
     //relationships
-    public function seller() :BelongsTo
+    public function user(): HasOne
+    {
+        return $this->hasOne(User::class, 'store_id', 'id');
+    }
+
+    public function payments() :HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+    
+    public function seller(): BelongsTo
     {
         return $this->belongsTo(Admin::class);
     }
@@ -44,21 +56,6 @@ class Store extends Model
     {
         return $this->hasMany(Product::class);
     }
-
-    public function supportReports(): HasMany
-    {
-        return $this->hasMany(SupportReport::class);
-    }
-
-    // public function expenses(): HasMany
-    // {
-    //     return $this->hasMany(Expense::class);
-    // }
-
-    // public function sales(): HasMany
-    // {
-    //     return $this->hasMany(Sale::class);
-    // }
 
     public function settings(): BelongsToMany
     {

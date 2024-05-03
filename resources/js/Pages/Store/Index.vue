@@ -1,9 +1,9 @@
 <template>
-    <AppLayout title="Suscripciones">
+    <AppLayout title="Tiendas (suscripciones)">
         <div class="px-2 lg:px-10 py-7">
             <!-- header botones -->
             <div class="flex justify-between items-center mx-3">
-                <h1 class="font-bold text-lg">Suscripciones (tiendas)</h1>
+                <h1 class="font-bold text-lg">Tiendas (suscripciones)</h1>
             </div>
 
             <!-- Buscador y filtros -->
@@ -25,22 +25,22 @@
 
             <Loading v-if="loading" class="mt-20" />
             <div v-else class="mt-8">
-                <p v-if="localSuscriptions.length" class="text-gray66 text-[11px] mb-2">{{ localSuscriptions.length }}
+                <p v-if="localStores.length" class="text-gray66 text-[11px] mb-2">{{ localStores.length }}
                     de {{
-                        total_suscriptions }}
+                        total_stores }}
                     elementos
                 </p>
-                <SuscriptionsTable :items="localSuscriptions" />
-                <p v-if="localSuscriptions.length" class="text-gray66 text-[11px] mt-1">{{ localSuscriptions.length }}
+                <StoresTable :items="localStores" />
+                <p v-if="localStores.length" class="text-gray66 text-[11px] mt-1">{{ localStores.length }}
                     de {{
-                        total_suscriptions }}
+                        total_stores }}
                     elementos
                 </p>
                 <p v-if="loadingItems" class="text-xs my-4 text-center">
                     Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-secondary"></i>
                 </p>
                 <button
-                    v-else-if="localSuscriptions.length && !search && !filtered && (total_suscriptions > 10 && localSuscriptions.length < total_suscriptions)"
+                    v-else-if="localStores.length && !search && !filtered && (total_stores > 10 && localStores.length < total_stores)"
                     @click="fetchItemsByPage"
                     class="w-full text-secondary my-4 text-xs mx-auto underline ml-6">Cargar más elementos</button>
             </div>
@@ -53,7 +53,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import InputLabel from "@/Components/InputLabel.vue";
 import Loading from '@/Components/MyComponents/Loading.vue';
-import SuscriptionsTable from '@/Components/MyComponents/Suscription/SuscriptionsTable.vue';
+import StoresTable from '@/Components/MyComponents/Store/StoresTable.vue';
 import axios from 'axios';
 
 export default {
@@ -61,9 +61,9 @@ export default {
         return {
             searchTemp: null,
             search: null,
-            suscriptionsBuffer: [],
+            storesBuffer: [],
             loading: false,
-            localSuscriptions: this.suscriptions,
+            localStores: this.stores,
             filter: null,
             filtered: false,
             showFilter: false, //filtro opciones
@@ -72,7 +72,7 @@ export default {
             options: [
                 {
                     label: "Tipo de suscripción ",
-                    value: "suscription_period",
+                    value: "store_period",
                     children: [
                         {
                             label: 'Mensual',
@@ -115,11 +115,11 @@ export default {
         PrimaryButton,
         InputLabel,
         Loading,
-        SuscriptionsTable,
+        StoresTable,
     },
     props: {
-        suscriptions: Object,
-        total_suscriptions: Number,
+        stores: Object,
+        total_stores: Number,
         sellers: Array,
     },
     methods: {
@@ -130,12 +130,12 @@ export default {
             if (this.search) {
                 this.fetchMatches();
             } else {
-                this.showAllSuscriptions();
+                this.showAllStores();
             }
         },
         handleTagClose() {
             this.search = null;
-            this.showAllSuscriptions();
+            this.showAllStores();
         },
         handleChangeFilter() {
             this.handleTagClose();
@@ -143,20 +143,20 @@ export default {
                 this.fetchFiltered();
             }
         },
-        showAllSuscriptions() {
+        showAllStores() {
             // solo si hay items en el buffer, para no dejar vacio el arreglo principal
-            if (this.suscriptionsBuffer.length) {
-                this.localSuscriptions = this.suscriptionsBuffer;
-                this.suscriptionsBuffer = [];
+            if (this.storesBuffer.length) {
+                this.localStores = this.storesBuffer;
+                this.storesBuffer = [];
             }
         },
         async fetchItemsByPage() {
             try {
                 this.loadingItems = true;
-                const response = await axios.get(route('suscriptions.get-by-page', this.currentPage));
+                const response = await axios.get(route('stores.get-by-page', this.currentPage));
 
                 if (response.status === 200) {
-                    this.localSuscriptions = [...this.localSuscriptions, ...response.data.items];
+                    this.localStores = [...this.localStores, ...response.data.items];
                     this.currentPage++;
                 }
             } catch (error) {
@@ -169,13 +169,13 @@ export default {
             try {
                 this.filtered = false;
                 this.loading = true;
-                const response = await axios.get(route('suscriptions.get-matches', { query: this.search }));
+                const response = await axios.get(route('stores.get-matches', { query: this.search }));
 
                 if (response.status === 200) {
-                    if (!this.suscriptionsBuffer.length) {
-                        this.suscriptionsBuffer = this.localSuscriptions;
+                    if (!this.storesBuffer.length) {
+                        this.storesBuffer = this.localStores;
                     }
-                    this.localSuscriptions = response.data.items;
+                    this.localStores = response.data.items;
                 }
             } catch (error) {
                 console.log(error);
@@ -186,14 +186,14 @@ export default {
         async fetchFiltered() {
             try {
                 this.loading = true;
-                const response = await axios.get(route('suscriptions.get-filters', { prop: this.filter[0], value: this.filter[1] }));
+                const response = await axios.get(route('stores.get-filters', { prop: this.filter[0], value: this.filter[1] }));
 
                 if (response.status === 200) {
                     // si el bufer no tiene nada aun, guardar las suscripciones
-                    if (!this.suscriptionsBuffer.length) {
-                        this.suscriptionsBuffer = this.localSuscriptions;
+                    if (!this.storesBuffer.length) {
+                        this.storesBuffer = this.localStores;
                     }
-                    this.localSuscriptions = response.data.items;
+                    this.localStores = response.data.items;
                     this.filtered = true;
                 }
             } catch (error) {
@@ -205,10 +205,10 @@ export default {
         async fetchItemsByPage() {
             try {
                 this.loadingItems = true;
-                const response = await axios.get(route('suscriptions.get-by-page', this.currentPage));
+                const response = await axios.get(route('stores.get-by-page', this.currentPage));
 
                 if (response.status === 200) {
-                    this.localSuscriptions = { ...this.localSuscriptions, ...response.data.items };
+                    this.localStores = { ...this.localStores, ...response.data.items };
                     this.currentPage++;
                 }
             } catch (error) {
