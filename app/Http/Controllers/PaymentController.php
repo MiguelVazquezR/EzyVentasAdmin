@@ -48,4 +48,15 @@ class PaymentController extends Controller
     {
         //
     }
+
+    public function updateStatus(Request $request, Payment $payment)
+    {
+        $payment->update([
+            'status' => $request->status,
+            'validated_at' => now(),
+            'validated_by_id' => auth()->id(),
+            'rejected_reazon' => $request->rejected_reazon,
+        ]);
+
+    }
 }

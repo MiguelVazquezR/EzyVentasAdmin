@@ -14,10 +14,15 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->string('payment_method');
-            $table->string('suscription_period')->default('mensual');
+            $table->string('suscription_period');
+            $table->string('status')->default('En revisión');
+            $table->text('rejected_reazon')->nullable();
+            $table->text('notes')->nullable();
             $table->unsignedFloat('amount');
-            $table->timestamp('next_payment');
-            $table->foreignId('suscription_id')->constrained('stores')->cascadeOnDelete();
+            $table->unsignedFloat('days_gifted')->default(0);
+            $table->foreignId('store_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('validated_by_id')->constrained('admins')->cascadeOnDelete();
+            $table->timestamp('validated_at')->nullable();
             $table->timestamps();
         });
     }
