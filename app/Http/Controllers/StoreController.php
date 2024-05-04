@@ -25,6 +25,7 @@ class StoreController extends Controller
 
         $total_stores = Store::all()->count();
 
+        // return $stores;
         return inertia('Store/Index', compact('sellers', 'total_stores', 'stores'));
     }
 
