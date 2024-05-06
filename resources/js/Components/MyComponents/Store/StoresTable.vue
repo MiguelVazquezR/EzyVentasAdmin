@@ -21,7 +21,12 @@
                     <td>{{ item.contact_name }}</td>
                     <td>{{ item.user?.email ?? '-' }}</td>
                     <td>{{ formatDateTime(item.created_at) }}</td>
-                    <td @click.stop="suscriptionDetailsModal = true; storeSelected = item" class="underline">{{ item.suscription_period }}</td>
+                    <td>
+                        <button v-if="item.last_payment" @click.stop="prepareSuscriptionModal(item)" class="underline">
+                            {{ item.suscription_period }}
+                        </button>
+                        <span v-else>{{ item.suscription_period }}</span>
+                    </td>
                     <td>
                         <div class="flex items-center space-x-2">
                             <el-tooltip :content="item.status" placement="left">
@@ -81,7 +86,7 @@
         <i @click="suscriptionDetailsModal = false"
           class="fa-solid fa-xmark text-xs cursor-pointer size-7 flex items-center justify-center absolute right-3"></i>
 
-        <section class="mt-5 mb-2 md:grid grid-cols-2 gap-3 text-sm">
+        <form @submit.prevent="update" class="mt-5 mb-2 md:grid grid-cols-2 gap-3 text-sm">
             <h2 class="font-bold col-span-full ml-4">Detalle de pago de suscripción</h2>
             <div class="border border-[#D9D99D99] rounded-lg p-3 col-span-full">
                 <p class="mb-4">Información del contacto</p>
@@ -107,42 +112,43 @@
                     <p class="font-bold pt-1">Tipo de suscripción:</p>
                     <p class="">{{ storeSelected.suscription_period }}</p>
                     <p class="font-bold pt-1">Comprobante de pago:</p>
-                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2" v-if="storeSelected.media?.length > 0">
-                        <FileView v-for="file in ticket.data.media" :key="file" :file="file" />
+                    <div class="grid grid-cols-2 gap-2" v-if="storeSelected.last_payment.media?.length > 0">
+                        <FileView v-for="file in storeSelected.last_payment.media" :key="file" :file="file" />
                     </div>
                     <p v-else class=" text-gray-400 text-xs">No hay archivos adjuntos</p>
                 </div>
                 <div class="grid grid-cols-2 col-span-full gap-x-4 mt-2">
-                    <p class="font-bold pt-1">Validación de pago:<i class="ml-2 text-xs" :class="getValidationIcon()"></i></p>
-                    <p class="font-bold pt-1">Agregar suscripción</p>
-                    <el-select class="w-1/2" v-model="form.status" clearable
+                    <p class="pt-1 pl-2">Validación de pago:<i class="ml-2 text-xs" :class="getValidationIcon()"></i></p>
+                    <p class="pt-1 pl-2">Agregar suscripción</p>
+                    <el-select v-model="form.status" clearable
                         placeholder="Seleccione" no-data-text="No hay opciones registradas"
                         no-match-text="No se encontraron coincidencias">
                         <el-option v-for="item in paymentValidations" :key="item" :label="item" :value="item" />
                     </el-select>
-                    <el-select class="w-1/2" v-model="form.suscription" clearable
+                    <el-select v-model="form.suscription" clearable
                         placeholder="Seleccione" no-data-text="No hay opciones registradas"
                         no-match-text="No se encontraron coincidencias">
                         <el-option v-for="item in suscriptions" :key="item" :label="item" :value="item" />
                     </el-select>
-                    <div v-if="form.status === 'Rechazar'">
-                        <p class="font-bold pt-1">Motivo:</p>
+                    <InputError :message="form.errors.status" />
+                    <InputError :message="form.errors.suscription" />
+                    <div v-if="form.status === 'Rechazado'" class="col-span-full">
+                        <p class="pt-1">Motivo:</p>
                         <el-input v-model="form.rejected_reason" :autosize="{ minRows: 3, maxRows: 5 }" type="textarea"
-                        placeholder="Escribe tus notas" :maxlength="255" show-word-limit clearable />
+                        placeholder="Ej. El ticket no es válido por..." :maxlength="500" show-word-limit clearable />
                     </div>
                 </div>
             </div>
 
           <div class="col-span-full mt-2">
             <InputLabel value="Comentarios:" class="!text-sm ml-2" />
-            <el-input v-model="form.registerNotes" :autosize="{ minRows: 3, maxRows: 5 }" type="textarea"
-              placeholder="Escribe tus notas" :maxlength="255" show-word-limit clearable />
+            <el-input v-model="form.notes" :autosize="{ minRows: 3, maxRows: 5 }" type="textarea"
+              placeholder="Escribe tus notas" :maxlength="500" show-word-limit clearable />
           </div>
-
           <div class="flex justify-end space-x-1 pt-2 pb-1 py-2 col-span-full">
-            <PrimaryButton>Confirmar</PrimaryButton>
+            <PrimaryButton :disabled="form.processing">Confirmar</PrimaryButton>
           </div>
-        </section>
+        </form>
       </div>
     </Modal>
     <!-- --------------------------- Modal detalles de suscripción (tienda) ends ------------------------------------ -->
@@ -167,6 +173,7 @@
 import ConfirmationModal from '@/Components/ConfirmationModal.vue';
 import FileView from "@/Components/MyComponents/FileView.vue";
 import InputLabel from "@/Components/InputLabel.vue";
+import InputError from "@/Components/InputError.vue";
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import DangerButton from "@/Components/DangerButton.vue";
 import CancelButton from "@/Components/MyComponents/CancelButton.vue";
@@ -181,6 +188,7 @@ export default {
             status: null,
             suscription: null,
             rejected_reason: null,
+            notes: null,
         });
 
         return {
@@ -194,11 +202,13 @@ export default {
                 'Próximo a vencer': '#F68C0F',
                 'Vencido': '#F32C2C',
             },
-            paymentValidations: ['Aprobar', 'Rechazar'],
-            suscriptions: ['Suscripción mensual (30 días)',
-                'Suscripción trimestral (3 meses) +7 días gratis',
-                'Suscripción semestral (6 meses) +14 días gratis',
-                'Suscripción anual (12 meses) +65 días gratis'
+            paymentValidations: ['Aprobado', 'Rechazado', 'En revisión'],
+            suscriptions: [
+                'Periodo de prueba',
+                'Mensual',
+                'Trimestral',
+                'Semestral',
+                'Anual'
              ],
         };
     },
@@ -208,6 +218,7 @@ export default {
         DangerButton,
         CancelButton,
         InputLabel,
+        InputError,
         FileView,
         Modal
     },
@@ -215,6 +226,35 @@ export default {
         items: Array,
     },
     methods: {
+        prepareSuscriptionModal(store) {
+            this.suscriptionDetailsModal = true;
+            this.storeSelected = store;
+
+            // preparar formulario de modal
+            this.form.status = store.last_payment.status;
+            this.form.suscription = store.last_payment.suscription_period;
+            this.form.rejected_reason = store.last_payment.rejected_reason;
+            this.form.notes = store.last_payment.notes;
+        },
+        update() {
+            this.form.put(route('payments.validate', this.storeSelected.last_payment.id), {
+                onSuccess: () => {
+                    this.$notify({
+                        title: 'Validación enviada a cliente',
+                        message: '',
+                        type: 'success',
+                    });
+                    // actualizar datos del pago validado
+                    this.storeSelected.status = this.form.status;
+                    this.storeSelected.suscription_period = this.form.suscription;
+                    this.storeSelected.rejected_reason = this.form.rejected_reason;
+                    this.storeSelected.notes = this.form.notes;
+
+                    // cerrar modal
+                    this.suscriptionDetailsModal = false;
+                },
+            });
+        },
         formatDateTime(dateTime) {
             let parsedDate = new Date(dateTime);
 
@@ -238,9 +278,9 @@ export default {
             return 'fa-solid fa-circle-exclamation text-red-600';
         },
         getValidationIcon() {
-            if ( this.form.status === 'Aprobar' ) {
+            if ( this.form.status === 'Aprobado' ) {
                 return 'fa-solid fa-check text-green-400';
-            } else if ( this.form.status === 'Rechazar' ) {
+            } else if ( this.form.status === 'Rechazado' ) {
                 return 'fa-solid fa-xmark text-red-500';
             }
             return 'fa-regular fa-clock text-amber-400';

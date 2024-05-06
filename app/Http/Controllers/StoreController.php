@@ -19,13 +19,12 @@ class StoreController extends Controller
         })->values()->all();
 
         $stores = Store::latest('id')
-            ->with(['user', 'seller'])
+            ->with(['user', 'seller', 'lastPayment.media'])
             ->get()
             ->take(30);
 
         $total_stores = Store::all()->count();
 
-        // return $stores;
         return inertia('Store/Index', compact('sellers', 'total_stores', 'stores'));
     }
 
