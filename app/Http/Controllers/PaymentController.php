@@ -20,7 +20,7 @@ class PaymentController extends Controller
         //
     }
 
-    
+
     public function store(Request $request)
     {
         //
@@ -59,7 +59,6 @@ class PaymentController extends Controller
             'validated_by_id' => auth()->id(),
             'rejected_reason' => $request->rejected_reason,
         ]);
-
     }
 
     public function validatePayment(Request $request, Payment $payment)
@@ -73,11 +72,13 @@ class PaymentController extends Controller
         ]);
 
         // notificar a cliente de validacion de pago
-        // $admins = Admin::where('employee_properties->department', 'Dirección')->get();
-        // $title = "Nuevo pago registrado";
-        // $description = "La tienda '$store->name' ha pagado una suscripción {$validated['suscription_period']} ($ {$validated['amount']}).";
-        // $url = 'https://admin.ezyventas.com/suscriptions';
-        // $payment->store->user->notify(new StoreBasicNotification());
-
+        $title = "Respuesta a pago registrado";
+        $description = "Tu pago creado el {$payment->created_at->isoFormat('ddd DD MMMM, Y')} tiene un estatus de <b class='text-primary'>$payment->status</b>";
+        if (app()->environment() === 'local'){
+            $url = 'http://localhost:8000/user/profile';
+        } else {
+            $url = 'https://ezyventas.com/user/profile';
+        }
+        $payment->store->user->notify(new StoreBasicNotification($title, $description, $url));
     }
 }

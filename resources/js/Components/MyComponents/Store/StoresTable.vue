@@ -245,10 +245,10 @@ export default {
                         type: 'success',
                     });
                     // actualizar datos del pago validado
-                    this.storeSelected.status = this.form.status;
-                    this.storeSelected.suscription_period = this.form.suscription;
-                    this.storeSelected.rejected_reason = this.form.rejected_reason;
-                    this.storeSelected.notes = this.form.notes;
+                    this.storeSelected.last_payment.status = this.form.status;
+                    this.storeSelected.last_payment.suscription_period = this.form.suscription;
+                    this.storeSelected.last_payment.rejected_reason = this.form.rejected_reason;
+                    this.storeSelected.last_payment.notes = this.form.notes;
 
                     // cerrar modal
                     this.suscriptionDetailsModal = false;
