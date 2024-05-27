@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Admin;
+use App\Models\Setting;
+use App\Models\SettingHistory;
 use App\Models\Store;
 use Illuminate\Http\Request;
 
 class StoreController extends Controller
 {
-
     public function index()
     {
         // Obtener todos los vendedores y seleccionar solo las columnas id y name
@@ -39,7 +40,7 @@ class StoreController extends Controller
     }
 
     public function show($store_id)
-    {   
+    {
         $store = Store::with(['seller', 'payments'])->find($store_id);
         $stores = Store::latest('id')->get(['id', 'name']);
 
@@ -94,5 +95,38 @@ class StoreController extends Controller
             ->take(30);
 
         return response()->json(['items' => $stores]);
+    }
+
+    public function support(Store $store)
+    {
+        $store = $store->load(['settings']);
+
+        return inertia('Store/Support', compact('store'));
+    }
+
+    // API
+    public function getSettingsByModule(Store $store, $module)
+    {
+        $items = $store->settings()->where('module', $module)->get();
+
+        return response()->json(compact('items'));
+    }
+
+    public function toggleSettingValue(Request $request, Store $store, $setting_id)
+    {
+        $new_value = $request->value ? 1 : null;
+        $store->settings()->updateExistingPivot($setting_id, ['value' => $new_value]);
+        $setting_name = Setting::find($setting_id)->key;
+        $action = $new_value ? 'activó' : 'desactivó';
+
+        // Guardar el movimiento en historial
+        SettingHistory::create([
+            'description' => $action . " la configuración \"$setting_name\"",
+            'user_name' => auth()->user()->name,
+            'store_id' => $store->id,
+        ]);
+
+
+        return response()->json([]);
     }
 }

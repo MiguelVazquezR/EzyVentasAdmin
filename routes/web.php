@@ -5,6 +5,7 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GlobalProductController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\SettingHistoryController;
 use App\Http\Controllers\SupportReportController;
 use App\Http\Controllers\StoreController;
 use Illuminate\Foundation\Application;
@@ -38,9 +39,12 @@ Route::post('admins/update-with-media/{admin}', [AdminController::class, 'update
 // stores routes-----------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------
 Route::resource('stores', StoreController::class)->middleware('web');
+Route::get('stores-support/{store}', [StoreController::class, 'support'])->name('stores.support')->middleware(['auth']);
 Route::get('stores-get-by-page/{currentPage}', [StoreController::class, 'getItemsByPage'])->name('stores.get-by-page')->middleware('auth');
 Route::get('stores-get-matches/{query}', [StoreController::class, 'getMatches'])->name('stores.get-matches');
 Route::get('stores-get-filters/{prop}/{value}', [StoreController::class, 'getFilters'])->name('stores.get-filters');
+Route::get('stores-get-settings-by-module/{store}/{module}', [StoreController::class, 'getSettingsByModule'])->middleware('auth')->name('stores.get-settings-by-module');
+Route::put('stores/toggle-setting-value/{store}/{setting_id}', [StoreController::class, 'toggleSettingValue'])->middleware('auth')->name('stores.toggle-setting-value');
 
 
 //Global products routes (Catálgo base)----------------------------------------------------------------------------------
@@ -61,6 +65,11 @@ Route::resource('categories', CategoryController::class)->middleware('auth');
 //brands routes------------------------------------------------------------------------------------------  
 //-------------------------------------------------------------------------------------------------------
 Route::resource('brands', BrandController::class)->middleware('auth');
+
+
+//setting history routes------------------------------------------------------------------------------------------  
+//-------------------------------------------------------------------------------------------------------
+Route::get('setting-histories-get-by-store/{store}', [SettingHistoryController::class, 'getByStore'])->middleware('auth')->name('setting-histories.get-by-store');
 
 
 //Payments routes------------------------------------------------------------------------------------------  
