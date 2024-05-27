@@ -19,7 +19,7 @@ class StoreController extends Controller
         })->values()->all();
 
         $stores = Store::latest('id')
-            ->with(['user', 'seller'])
+            ->with(['user', 'seller', 'lastPayment.media'])
             ->get()
             ->take(30);
 

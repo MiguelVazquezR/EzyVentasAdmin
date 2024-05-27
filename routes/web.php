@@ -67,6 +67,7 @@ Route::resource('brands', BrandController::class)->middleware('auth');
 //---------------------------------------------------------------------------------------------------------
 Route::resource('payments', PaymentController::class)->middleware('auth');
 Route::put('payments/update-status/{payment}', [PaymentController::class, 'updateStatus'])->name('payments.update-status')->middleware('auth');
+Route::put('payments/validate/{payment}', [PaymentController::class, 'validatePayment'])->name('payments.validate')->middleware('auth');
 
 
 //support-reports routes------------------------------------------------------------------------------------------  

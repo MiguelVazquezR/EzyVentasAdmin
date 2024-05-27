@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Store extends Model
 {
@@ -75,5 +77,10 @@ class Store extends Model
                 'max_stock',
                 'current_stock',
             ])->withTimestamps();
+    }
+
+    public function lastPayment()
+    {
+        return $this->hasOne(Payment::class)->latest();
     }
 }

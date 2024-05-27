@@ -10,7 +10,7 @@
                 </div>
                 
                 <section class="flex space-x-4">
-                    <div class="text-gray99 w-56 mt-4">
+                    <div class="text-gray99 w-72 mt-4">
                         <p>Número de reporte:</p>
                         <p>Fecha de reporte:</p>
                         <p>Tipo de problema:</p>
@@ -27,7 +27,7 @@
                         <p>{{ support_report.id }}</p>
                         <p>{{ formatDateTime(support_report.created_at) }}</p>
                         <p>{{ support_report.type }}</p>
-                        <p class="mb-5">{{ support_report.description }}</p>
+                        <p class="mb-5">{{ support_report.description ?? '-' }}</p>
                         <p :class="statusStyles(support_report.status)" class="px-2 text-center rounded-full inline-block">{{ support_report.status }}</p>
                         <p>{{ support_report.store.seller?.name }}</p>
                         <p class="mb-5 bg-yellow-100">{{ support_report.notes ?? '-'}}</p>
@@ -35,7 +35,19 @@
                         <p>{{ support_report.store?.contact_name }}</p>
                         <p>{{ support_report.store?.contact_phone }}</p>
                     </div>
+
                 </section>
+
+                <div class="mt-5">
+                    <InputLabel value="Documentos adjuntos" class="ml-2 !text-gray-400" />
+                    <li v-if="support_report?.media.length" v-for="file in support_report?.media" :key="file" class="flex items-center justify-between col-span-full">
+                        <a :href="procesarUrlImagen(file.original_url)" target="_blank" class="flex items-center">
+                            <i :class="getFileTypeIcon(file.file_name)"></i>
+                            <span class="ml-2">{{ file.file_name }}</span>
+                        </a>
+                    </li>
+                    <p class="text-sm text-gray-400 ml-4" v-else><i class="fa-regular fa-file-excel mr-3"></i>No hay archivos adjuntos</p>
+                </div>
 
                 <div class="mt-10">
                     <InputLabel value="Comentarios" class="text-sm ml-2 !text-gray-400" />
@@ -125,6 +137,28 @@ methods:{
                 this.form.reset();
             },
         });
+    },
+    getFileTypeIcon(fileName) {
+      // Asocia extensiones de archivo a iconos
+      const fileExtension = fileName.split('.').pop().toLowerCase();
+      switch (fileExtension) {
+        case 'pdf':
+          return 'fa-regular fa-file-pdf text-red-700';
+        case 'jpg':
+        case 'jpeg':
+        case 'png':
+        case 'gif':
+          return 'fa-regular fa-image text-blue-300';
+        default:
+          return 'fa-regular fa-file-lines';
+      }
+    },
+    // Método para procesar la URL de la imagen manda a la ruta de la app.
+    procesarUrlImagen(originalUrl) {
+        // Reemplaza la parte inicial de la URL
+        const nuevaUrl = originalUrl.replace('https://admin.ezyventas.com/', 'https://ezyventas.com/');
+        // const nuevaUrl = originalUrl.replace('http://localhost:8000', 'https://ezyventas.com/'); //para hacer pruebas en local
+        return nuevaUrl;
     },
 }
 }

@@ -17,11 +17,16 @@
                 <tr @click="$inertia.visit(route('stores.show', item))" v-for="item in items" :key="item.id"
                     class="*:text-xs *:py-2 *:px-4 hover:bg-primarylight cursor-pointer">
                     <td class="rounded-s-full">{{ item.id }}</td>
-                    <td>{{ item.name }}</td>
+                    <td><i class="mr-1" :class="getStatusIcon()"></i>{{ item.name }}</td>
                     <td>{{ item.contact_name }}</td>
                     <td>{{ item.user?.email ?? '-' }}</td>
                     <td>{{ formatDateTime(item.created_at) }}</td>
-                    <td>{{ item.suscription_period }}</td>
+                    <td>
+                        <button v-if="item.last_payment" @click.stop="prepareSuscriptionModal(item)" class="underline">
+                            {{ item.suscription_period }}
+                        </button>
+                        <span v-else>{{ item.suscription_period }}</span>
+                    </td>
                     <td>
                         <div class="flex items-center space-x-2">
                             <el-tooltip :content="item.status" placement="left">
@@ -75,6 +80,79 @@
         </table>
     </div>
 
+    <!-- -------------- Modal detalles de suscripción (tienda) starts----------------------- -->
+    <Modal :show="suscriptionDetailsModal" @close="suscriptionDetailsModal = false; form.reset()">
+      <div class="p-4 relative">
+        <i @click="suscriptionDetailsModal = false"
+          class="fa-solid fa-xmark text-xs cursor-pointer size-7 flex items-center justify-center absolute right-3"></i>
+
+        <form @submit.prevent="update" class="mt-5 mb-2 md:grid grid-cols-2 gap-3 text-sm">
+            <h2 class="font-bold col-span-full ml-4">Detalle de pago de suscripción</h2>
+            <div class="border border-[#D9D99D99] rounded-lg p-3 col-span-full">
+                <p class="mb-4">Información del contacto</p>
+                <p class="font-bold">Tienda:</p>
+                <p class="">{{ storeSelected.name }}</p>
+
+                <div class="mt-2 grid grid-cols-3 gap-x-3">
+                    <p class="font-bold">Contacto:</p>
+                    <p class="font-bold">Teléfono:</p>
+                    <p class="font-bold">Correo:</p>
+                    <p class="">{{ storeSelected.contact_name }}</p>
+                    <p class="">{{ storeSelected.contact_phone }}</p>
+                    <p class="">{{ storeSelected.user?.email ?? '-' }}</p>
+                </div>
+            </div>
+
+            <div class="mx-3 col-span-full">
+                <h2 class="font-bold">Información de la suscripción</h2>
+                
+                <div class="mt-3">
+                    <p class="font-bold">Fecha de suscripción:</p>
+                    <p class="">{{ formatDateTime(storeSelected.created_at) }}</p>
+                    <p class="font-bold pt-1">Tipo de suscripción:</p>
+                    <p class="">{{ storeSelected.suscription_period }}</p>
+                    <p class="font-bold pt-1">Comprobante de pago:</p>
+                    <div class="grid grid-cols-2 gap-2" v-if="storeSelected.last_payment.media?.length > 0">
+                        <FileView v-for="file in storeSelected.last_payment.media" :key="file" :file="file" />
+                    </div>
+                    <p v-else class=" text-gray-400 text-xs">No hay archivos adjuntos</p>
+                </div>
+                <div class="grid grid-cols-2 col-span-full gap-x-4 mt-2">
+                    <p class="pt-1 pl-2">Validación de pago:<i class="ml-2 text-xs" :class="getValidationIcon()"></i></p>
+                    <p class="pt-1 pl-2">Agregar suscripción</p>
+                    <el-select v-model="form.status" clearable
+                        placeholder="Seleccione" no-data-text="No hay opciones registradas"
+                        no-match-text="No se encontraron coincidencias">
+                        <el-option v-for="item in paymentValidations" :key="item" :label="item" :value="item" />
+                    </el-select>
+                    <el-select v-model="form.suscription" clearable
+                        placeholder="Seleccione" no-data-text="No hay opciones registradas"
+                        no-match-text="No se encontraron coincidencias">
+                        <el-option v-for="item in suscriptions" :key="item" :label="item" :value="item" />
+                    </el-select>
+                    <InputError :message="form.errors.status" />
+                    <InputError :message="form.errors.suscription" />
+                    <div v-if="form.status === 'Rechazado'" class="col-span-full">
+                        <p class="pt-1">Motivo:</p>
+                        <el-input v-model="form.rejected_reason" :autosize="{ minRows: 3, maxRows: 5 }" type="textarea"
+                        placeholder="Ej. El ticket no es válido por..." :maxlength="500" show-word-limit clearable />
+                    </div>
+                </div>
+            </div>
+
+          <div class="col-span-full mt-2">
+            <InputLabel value="Comentarios:" class="!text-sm ml-2" />
+            <el-input v-model="form.notes" :autosize="{ minRows: 3, maxRows: 5 }" type="textarea"
+              placeholder="Escribe tus notas" :maxlength="500" show-word-limit clearable />
+          </div>
+          <div class="flex justify-end space-x-1 pt-2 pb-1 py-2 col-span-full">
+            <PrimaryButton :disabled="form.processing">Confirmar</PrimaryButton>
+          </div>
+        </form>
+      </div>
+    </Modal>
+    <!-- --------------------------- Modal detalles de suscripción (tienda) ends ------------------------------------ -->
+
     <ConfirmationModal :show="showDeleteConfirm" @close="showDeleteConfirm = false">
         <template #title>
             <h1>Eliminar suscripción</h1>
@@ -93,14 +171,30 @@
 </template>
 <script>
 import ConfirmationModal from '@/Components/ConfirmationModal.vue';
+import FileView from "@/Components/MyComponents/FileView.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import InputError from "@/Components/InputError.vue";
+import PrimaryButton from '@/Components/PrimaryButton.vue';
 import DangerButton from "@/Components/DangerButton.vue";
 import CancelButton from "@/Components/MyComponents/CancelButton.vue";
+import Modal from "@/Components/Modal.vue";
+import { useForm } from "@inertiajs/vue3";
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 export default {
     data() {
+        const form = useForm({
+            status: null,
+            suscription: null,
+            rejected_reason: null,
+            notes: null,
+        });
+
         return {
+            form,
+            storeSelected: null, //tienda seleccionada para mostrar los detalles de la suscripción en el modal
+            suscriptionDetailsModal: false, //modal de detalle de suscripción
             showDeleteConfirm: false,
             itemIdToDelete: null,
             statuses: {
@@ -108,17 +202,59 @@ export default {
                 'Próximo a vencer': '#F68C0F',
                 'Vencido': '#F32C2C',
             },
+            paymentValidations: ['Aprobado', 'Rechazado', 'En revisión'],
+            suscriptions: [
+                'Periodo de prueba',
+                'Mensual',
+                'Trimestral',
+                'Semestral',
+                'Anual'
+             ],
         };
     },
     components: {
         ConfirmationModal,
+        PrimaryButton,
         DangerButton,
         CancelButton,
+        InputLabel,
+        InputError,
+        FileView,
+        Modal
     },
     props: {
         items: Array,
     },
     methods: {
+        prepareSuscriptionModal(store) {
+            this.suscriptionDetailsModal = true;
+            this.storeSelected = store;
+
+            // preparar formulario de modal
+            this.form.status = store.last_payment.status;
+            this.form.suscription = store.last_payment.suscription_period;
+            this.form.rejected_reason = store.last_payment.rejected_reason;
+            this.form.notes = store.last_payment.notes;
+        },
+        update() {
+            this.form.put(route('payments.validate', this.storeSelected.last_payment.id), {
+                onSuccess: () => {
+                    this.$notify({
+                        title: 'Validación enviada a cliente',
+                        message: '',
+                        type: 'success',
+                    });
+                    // actualizar datos del pago validado
+                    this.storeSelected.last_payment.status = this.form.status;
+                    this.storeSelected.last_payment.suscription_period = this.form.suscription;
+                    this.storeSelected.last_payment.rejected_reason = this.form.rejected_reason;
+                    this.storeSelected.last_payment.notes = this.form.notes;
+
+                    // cerrar modal
+                    this.suscriptionDetailsModal = false;
+                },
+            });
+        },
         formatDateTime(dateTime) {
             let parsedDate = new Date(dateTime);
 
@@ -136,6 +272,18 @@ export default {
                 this.showDeleteConfirm = true;
                 this.itemIdToDelete = itemId;
             }
+        },
+        getStatusIcon() {
+            return 'fa-solid fa-bolt text-green-400';
+            return 'fa-solid fa-circle-exclamation text-red-600';
+        },
+        getValidationIcon() {
+            if ( this.form.status === 'Aprobado' ) {
+                return 'fa-solid fa-check text-green-400';
+            } else if ( this.form.status === 'Rechazado' ) {
+                return 'fa-solid fa-xmark text-red-500';
+            }
+            return 'fa-regular fa-clock text-amber-400';
         },
     },
 }
