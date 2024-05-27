@@ -31,7 +31,7 @@
                         total_reports }}
                     elementos
                 </p>
-                <SuscriptionsTable :items="localReports" />
+                <StoresTable :items="localReports" />
                 <p v-if="localReports.length" class="text-gray66 text-[11px] mt-1">{{ localReports.length }}
                     de {{
                         total_reports }}
@@ -54,7 +54,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import InputLabel from "@/Components/InputLabel.vue";
 import Loading from '@/Components/MyComponents/Loading.vue';
-import SuscriptionsTable from '@/Components/MyComponents/Suscription/SuscriptionsTable.vue';
+import StoresTable from '@/Components/MyComponents/Store/StoresTable.vue';
 import axios from 'axios';
 
 export default {
@@ -113,7 +113,7 @@ export default {
     },
     components: {
         AppLayout,
-        SuscriptionsTable,
+        StoresTable,
         PrimaryButton,
         InputLabel,
         Loading,
@@ -186,7 +186,7 @@ export default {
         async fetchFiltered() {
             try {
                 this.loading = true;
-                const response = await axios.get(route('suscriptions.get-filters', { prop: this.filter[0], value: this.filter[1] }));
+                const response = await axios.get(route('stores.get-filters', { prop: this.filter[0], value: this.filter[1] }));
 
                 if (response.status === 200) {
                     // si el bufer no tiene nada aun, guardar las suscripciones
@@ -205,7 +205,7 @@ export default {
         async fetchItemsByPage() {
             try {
                 this.loadingItems = true;
-                const response = await axios.get(route('suscriptions.get-by-page', this.currentPage));
+                const response = await axios.get(route('stores.get-by-page', this.currentPage));
 
                 if (response.status === 200) {
                     this.localReports = { ...this.localReports, ...response.data.items };
