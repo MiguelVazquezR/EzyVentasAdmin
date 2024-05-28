@@ -41,6 +41,7 @@ Route::resource('stores', StoreController::class)->middleware('web');
 Route::get('stores-get-by-page/{currentPage}', [StoreController::class, 'getItemsByPage'])->name('stores.get-by-page')->middleware('auth');
 Route::get('stores-get-matches/{query}', [StoreController::class, 'getMatches'])->name('stores.get-matches');
 Route::get('stores-get-filters/{prop}/{value}', [StoreController::class, 'getFilters'])->name('stores.get-filters');
+Route::put('stores-asign-seller/{store}', [StoreController::class, 'asignSeller'])->name('stores.asign-seller');
 
 
 //Global products routes (Catálgo base)----------------------------------------------------------------------------------
@@ -66,7 +67,6 @@ Route::resource('brands', BrandController::class)->middleware('auth');
 //Payments routes------------------------------------------------------------------------------------------  
 //---------------------------------------------------------------------------------------------------------
 Route::resource('payments', PaymentController::class)->middleware('auth');
-Route::put('payments/update-status/{payment}', [PaymentController::class, 'updateStatus'])->name('payments.update-status')->middleware('auth');
 Route::put('payments/validate/{payment}', [PaymentController::class, 'validatePayment'])->name('payments.validate')->middleware('auth');
 
 
