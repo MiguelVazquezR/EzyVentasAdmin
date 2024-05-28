@@ -11,8 +11,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="item in store.payments" :key="item" @click="showDetailsModal = true; itemToShow = item"
-                    class="*:text-xs *:py-2 *:px-4 hover:bg-primarylight cursor-pointer">
+                <tr v-for="item in store.payments" :key="item" class="*:text-xs *:py-2 *:px-4 hover:bg-primarylight">
                     <td class="rounded-s-full">{{ formatDate(item.created_at) }}</td>
                     <td>{{ item.suscription_period }}</td>
                     <td>{{ item.payment_method }}</td>
@@ -25,7 +24,7 @@
                             }">{{ item.status }}</p>
                     </td>
                     <td class="rounded-e-full text-end">
-                        <el-dropdown trigger="click" @command="handleCommand">
+                        <!-- <el-dropdown trigger="click" @command="handleCommand">
                             <button @click.stop
                                 class="el-dropdown-link justify-center items-center size-6 hover:bg-primary hover:text-primarylight rounded-full text-primary transition-all duration-200 ease-in-out">
                                 <i class="fa-solid fa-ellipsis-vertical"></i>
@@ -60,7 +59,7 @@
                                     </el-dropdown-item>
                                 </el-dropdown-menu>
                             </template>
-                        </el-dropdown>
+                        </el-dropdown> -->
                     </td>
                 </tr>
             </tbody>
