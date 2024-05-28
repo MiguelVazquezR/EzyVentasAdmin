@@ -95,4 +95,18 @@ class StoreController extends Controller
 
         return response()->json(['items' => $stores]);
     }
+
+    public function asignSeller(Request $request, Store $store)
+    {
+        // Actualizar el modelo Store con el nuevo seller_id
+        $store->update([
+            'seller_id' => $request->sellerId
+        ]);
+
+        // Cargar la relación 'seller' en el modelo actualizado
+        $store->load('seller', 'lastPayment.media');
+
+        // Devolver la respuesta con el modelo actualizado y la relación cargada
+        return response()->json(['item' => $store]);
+    }
 }
