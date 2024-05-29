@@ -17,20 +17,28 @@
                 <tr @click="$inertia.visit(route('stores.show', item))" v-for="item in items" :key="item.id"
                     class="*:text-xs *:py-2 *:px-4 hover:bg-primarylight cursor-pointer">
                     <td class="rounded-s-full">{{ item.id }}</td>
-                    <td><i class="mr-1" :class="getStatusIcon()"></i>{{ item.name }}</td>
+                    <td class="flex items-center space-x-2">
+                        <el-tooltip :content="item.status" placement="left">
+                            <i class="mr-1" :class="getStatusIcon( item.status)"></i>
+                        </el-tooltip>
+                        <p>{{ item.name }}</p>
+                    </td>
                     <td>{{ item.contact_name }}</td>
                     <td>{{ item.user?.email ?? '-' }}</td>
                     <td>{{ formatDateTime(item.created_at) }}</td>
                     <td>
-                        <button v-if="item.last_payment" @click.stop="prepareSuscriptionModal(item)" class="underline">
-                            {{ item.suscription_period }}
+                        <button v-if="item.last_payment" @click.stop="prepareSuscriptionModal(item)" class="flex items-center space-x-2">
+                            <el-tooltip :content="item.last_payment.status" placement="left">
+                                <i class="mr-1" :class="getPaymentStatusIcon(item.last_payment.status)"></i>
+                            </el-tooltip>
+                            <p class="border-b  border-dashed border-gray99">{{ item.suscription_period }}</p>
                         </button>
                         <span v-else>{{ item.suscription_period }}</span>
                     </td>
                     <td>
                         <div class="flex items-center space-x-2">
-                            <el-tooltip :content="item.status" placement="left">
-                                <i class="fa-solid fa-circle text-[8px]" :style="{ color: statuses[item.status] }"></i>
+                            <el-tooltip :content="getTooltipContent(item.next_payment)" placement="left">
+                                <i class="fa-solid fa-circle text-[8px]" :style="{ color: getStatusColor(item.next_payment) }"></i>
                             </el-tooltip>
                             <span>{{ formatDateTime(item.next_payment) }}</span>
                         </div>
@@ -62,6 +70,12 @@
                                         </svg>
                                         <span class="text-xs">Editar</span>
                                     </el-dropdown-item>
+                                    <el-dropdown-item :command="'seller-' + item.id">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-[14px] mr-2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
+                                        </svg>
+                                        <span class="text-xs">Asignar vendedor</span>
+                                    </el-dropdown-item>
                                     <el-dropdown-item :command="'delete-' + item.id">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                             stroke-width="1.5" stroke="currentColor"
@@ -86,7 +100,7 @@
         <i @click="suscriptionDetailsModal = false"
           class="fa-solid fa-xmark text-xs cursor-pointer size-7 flex items-center justify-center absolute right-3"></i>
 
-        <form @submit.prevent="update" class="mt-5 mb-2 md:grid grid-cols-2 gap-3 text-sm">
+        <form @submit.prevent="updatePaymentStatus" class="mt-5 mb-2 md:grid grid-cols-2 gap-3 text-sm">
             <h2 class="font-bold col-span-full ml-4">Detalle de pago de suscripción</h2>
             <div class="border border-[#D9D99D99] rounded-lg p-3 col-span-full">
                 <p class="mb-4">Información del contacto</p>
@@ -112,8 +126,8 @@
                     <p class="font-bold pt-1">Tipo de suscripción:</p>
                     <p class="">{{ storeSelected.suscription_period }}</p>
                     <p class="font-bold pt-1">Comprobante de pago:</p>
-                    <div class="grid grid-cols-2 gap-2" v-if="storeSelected.last_payment.media?.length > 0">
-                        <FileView v-for="file in storeSelected.last_payment.media" :key="file" :file="file" />
+                    <div class="grid grid-cols-2 gap-2" v-if="storeSelected.last_payment?.media?.length > 0">
+                        <FileView v-for="file in storeSelected.last_payment?.media" :key="file" :file="file" />
                     </div>
                     <p v-else class=" text-gray-400 text-xs">No hay archivos adjuntos</p>
                 </div>
@@ -125,7 +139,7 @@
                         no-match-text="No se encontraron coincidencias">
                         <el-option v-for="item in paymentValidations" :key="item" :label="item" :value="item" />
                     </el-select>
-                    <el-select v-model="form.suscription" clearable
+                    <el-select :disabled="form.status == 'Rechazado'" v-model="form.suscription" clearable
                         placeholder="Seleccione" no-data-text="No hay opciones registradas"
                         no-match-text="No se encontraron coincidencias">
                         <el-option v-for="item in suscriptions" :key="item" :label="item" :value="item" />
@@ -153,6 +167,29 @@
     </Modal>
     <!-- --------------------------- Modal detalles de suscripción (tienda) ends ------------------------------------ -->
 
+    <!-- -------------- Modal detalles de suscripción (tienda) starts----------------------- -->
+    <Modal :show="asignSellerModal" @close="asignSellerModal = false">
+      <div class="p-4 relative">
+        <i @click="asignSellerModal = false"
+          class="fa-solid fa-xmark text-xs cursor-pointer size-7 flex items-center justify-center absolute right-3"></i>
+        <h2 class="font-bold ml-4">Asignar vendedor</h2>
+
+        <div class="mt-3">
+            <InputLabel value="Responsable" class="ml-3 mb-1" />
+            <el-select v-model="asignedSeller" clearable
+                placeholder="Seleccione" no-data-text="No hay opciones registradas"
+                no-match-text="No se encontraron coincidencias">
+                <el-option v-for="item in sellers" :key="item" :label="item.label" :value="item.value" />
+            </el-select>
+        </div>
+
+        <div class="flex justify-end space-x-1 pt-2 pb-1 py-2 col-span-full">
+        <PrimaryButton @click="asignSeller" :disabled="form.processing">Asignar</PrimaryButton>
+        </div>
+      </div>
+    </Modal>
+    <!-- --------------------------- Modal detalles de suscripción (tienda) ends ------------------------------------ -->
+          
     <ConfirmationModal :show="showDeleteConfirm" @close="showDeleteConfirm = false">
         <template #title>
             <h1>Eliminar suscripción</h1>
@@ -181,6 +218,7 @@ import Modal from "@/Components/Modal.vue";
 import { useForm } from "@inertiajs/vue3";
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import axios from 'axios';
 
 export default {
     data() {
@@ -195,6 +233,9 @@ export default {
             form,
             storeSelected: null, //tienda seleccionada para mostrar los detalles de la suscripción en el modal
             suscriptionDetailsModal: false, //modal de detalle de suscripción
+            asignSellerModal: false, //modal de asignación de vendedor a la tienda
+            asignedSeller: null, //id del vendedor asignado a la tienda como responsable
+            storeId: null, //id de la tienda seleccionada
             showDeleteConfirm: false,
             itemIdToDelete: null,
             statuses: {
@@ -224,6 +265,7 @@ export default {
     },
     props: {
         items: Array,
+        sellers: Array,
     },
     methods: {
         prepareSuscriptionModal(store) {
@@ -236,7 +278,7 @@ export default {
             this.form.rejected_reason = store.last_payment.rejected_reason;
             this.form.notes = store.last_payment.notes;
         },
-        update() {
+        updatePaymentStatus() {
             this.form.put(route('payments.validate', this.storeSelected.last_payment.id), {
                 onSuccess: () => {
                     this.$notify({
@@ -244,7 +286,7 @@ export default {
                         message: '',
                         type: 'success',
                     });
-                    // actualizar datos del pago validado
+
                     this.storeSelected.last_payment.status = this.form.status;
                     this.storeSelected.last_payment.suscription_period = this.form.suscription;
                     this.storeSelected.last_payment.rejected_reason = this.form.rejected_reason;
@@ -271,11 +313,26 @@ export default {
             } else if (commandName == 'delete') {
                 this.showDeleteConfirm = true;
                 this.itemIdToDelete = itemId;
+            } else if ( commandName == 'seller' ) {
+                this.storeId = itemId;
+                this.asignSellerModal = true;
             }
         },
-        getStatusIcon() {
-            return 'fa-solid fa-bolt text-green-400';
-            return 'fa-solid fa-circle-exclamation text-red-600';
+        getStatusIcon( status ) {
+            if ( status === 'Pagado' ) {
+                return 'fa-solid fa-bolt text-green-400';
+            } else {
+                return 'fa-solid fa-circle-exclamation text-red-600';
+            }
+        },
+        getPaymentStatusIcon(status) {
+            if ( status === 'En revisión' ) {
+                return 'fa-regular fa-clock text-amber-400';
+            } else if ( status === 'Aprobado' ) {
+                return 'fa-solid fa-check text-green-400';
+            } else if ( status === 'Rechazado' ) {
+                return 'fa-solid fa-x text-red-500';
+            }
         },
         getValidationIcon() {
             if ( this.form.status === 'Aprobado' ) {
@@ -285,6 +342,57 @@ export default {
             }
             return 'fa-regular fa-clock text-amber-400';
         },
+        getStatusColor(nextPaymentDate) {
+            const today = new Date();
+            const nextPayment = new Date(nextPaymentDate);
+            const diffTime = nextPayment - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convertir a días
+
+            if (diffDays < 0) {
+                return 'red'; // Vencida
+            } else if (diffDays <= 5) {
+                return 'orange'; // Próxima a vencer
+            } else {
+                return '#59FB31'; // Pagada
+            }
+        },
+        getTooltipContent(nextPaymentDate) {
+            const today = new Date();
+            const nextPayment = new Date(nextPaymentDate);
+            const diffTime = nextPayment - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convertir a días
+
+            if (diffDays < 0) {
+                return 'Vencida';
+            } else if (diffDays <= 5) {
+                return 'Próxima a vencer';
+            } else {
+                return 'Pagada';
+            }
+        },
+        async asignSeller() {
+            try {
+                const response = await axios.put(route('stores.asign-seller', this.storeId), {sellerId: this.asignedSeller});
+                if ( response.status == 200 ) {
+                    const storeIndex = this.items.findIndex(item => item.id == this.storeId);
+
+                    //si se encuentra el index se actualiza la información de la tienda
+                    if ( storeIndex != -1 ) {
+                        this.items[storeIndex] = response.data.item;
+                    }
+
+                    this.$notify({
+                        title: "Correcto",
+                        message: "¡Se ha asignado correctamente!",
+                        type: "success",
+                    });
+
+                    this.asignSellerModal = false;
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
     },
 }
 </script>

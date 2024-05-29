@@ -45,6 +45,7 @@ Route::get('stores-get-matches/{query}', [StoreController::class, 'getMatches'])
 Route::get('stores-get-filters/{prop}/{value}', [StoreController::class, 'getFilters'])->name('stores.get-filters');
 Route::get('stores-get-settings-by-module/{store}/{module}', [StoreController::class, 'getSettingsByModule'])->middleware('auth')->name('stores.get-settings-by-module');
 Route::put('stores/toggle-setting-value/{store}/{setting_id}', [StoreController::class, 'toggleSettingValue'])->middleware('auth')->name('stores.toggle-setting-value');
+Route::put('stores-asign-seller/{store}', [StoreController::class, 'asignSeller'])->name('stores.asign-seller');
 
 
 //Global products routes (Catálgo base)----------------------------------------------------------------------------------
@@ -75,7 +76,6 @@ Route::get('setting-histories-get-by-store/{store}', [SettingHistoryController::
 //Payments routes------------------------------------------------------------------------------------------  
 //---------------------------------------------------------------------------------------------------------
 Route::resource('payments', PaymentController::class)->middleware('auth');
-Route::put('payments/update-status/{payment}', [PaymentController::class, 'updateStatus'])->name('payments.update-status')->middleware('auth');
 Route::put('payments/validate/{payment}', [PaymentController::class, 'validatePayment'])->name('payments.validate')->middleware('auth');
 
 

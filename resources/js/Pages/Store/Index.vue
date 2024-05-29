@@ -30,7 +30,7 @@
                         total_stores }}
                     elementos
                 </p>
-                <StoresTable :items="localStores" />
+                <StoresTable :items="localStores" :sellers="sellers" />
                 <p v-if="localStores.length" class="text-gray66 text-[11px] mt-1">{{ localStores.length }}
                     de {{
                         total_stores }}
