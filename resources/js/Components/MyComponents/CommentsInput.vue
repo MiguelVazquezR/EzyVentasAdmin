@@ -56,7 +56,7 @@ export default {
     commentableType: String,
     commentableId: Number,
   },
-  // emits: ['content', 'submitComment'], // Emite un evento personalizado para actualizar "value",
+  emits: ['storedComment'],
   computed: {
     hasContent() {
       return this.content.trim().length > 0;
@@ -156,6 +156,7 @@ export default {
         });
 
         if (response.status === 200) {
+          this.$emit('storedComment', response.data.item);
           this.$notify({
             title: "Comentario creado",
             message: "",

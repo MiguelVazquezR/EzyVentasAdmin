@@ -91,3 +91,4 @@ Route::resource('support-reports', SupportReportController::class)->middleware('
 Route::get('support-reports-get-by-page/{currentPage}', [SupportReportController::class, 'getItemsByPage'])->name('support-reports.get-by-page')->middleware('auth');
 Route::get('support-reports-get-matches/{query}', [SupportReportController::class, 'getMatches'])->name('support-reports.get-matches');
 Route::get('support-reports-get-by-page/{currentPage}', [SupportReportController::class, 'getItemsByPage'])->name('support-reports.get-by-page')->middleware('auth');
+Route::put('support-reports/change-status/{supportReport}/{status}', [SupportReportController::class, 'changeStatus'])->name('support-reports.change-status')->middleware('auth');

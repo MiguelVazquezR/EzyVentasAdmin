@@ -1,7 +1,7 @@
 <template>
     <AppLayout :title="'Detalles de reporte #' + support_report.id">
         <div class="px-3 lg:px-10 py-7">
-            <Back />
+            <Back :to="route('support-reports.index')" />
 
             <section class="rounded-lg border border-grayD9 lg:p-5 p-3 lg:w-1/2 mx-auto mt-7 text-sm">
                 <div class="flex items-center justify-between">
@@ -25,7 +25,7 @@
                     <p class="col-span-2 relative">
                         <i class="fa-solid fa-circle text-[8px] absolute -left-4 bottom-2"
                             :class="{ 'text-[#14D104]': form.status == 'Resuelto', 'text-[#6FBAFE]': form.status == 'En proceso', 'text-[#9E66F8]': form.status == 'Pendiente', }"></i>
-                        <el-select v-model="form.status" placeholder="Seleccione" size="small" class="!w-1/2"
+                        <el-select v-model="form.status" @change="changeStatus" placeholder="Seleccione" size="small" class="!w-1/2"
                             no-data-text="No hay opciones registradas" no-match-text="No se encontraron coincidencias">
                             <el-option v-for="item in ['Resuelto', 'En proceso', 'Pendiente']" :key="item" :label="item"
                                 :value="item">
@@ -65,12 +65,10 @@
                 </section>
                 <section class="mt-6">
                     <h2 class="text-gray37">Comentarios</h2>
-                    <ul class="my-3">
-                        <li v-for="(item, index) in support_report.comments" :key="index">
-                            • {{ item }}
-                        </li>
+                    <ul class="my-3 space-y-3">
+                        <CommentsCard v-for="item in support_report.comments" :comment="item" />
                     </ul>
-                    <CommentsInput :userList="admins" commentableType="App\Models\SupportReport"
+                    <CommentsInput @storedComment="addNewComment" :userList="admins" commentableType="App\Models\SupportReport"
                         :commentableId="support_report.id" />
                 </section>
 
@@ -89,6 +87,7 @@ import InputError from "@/Components/InputError.vue";
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import Back from "@/Components/MyComponents/Back.vue";
 import CommentsInput from "@/Components/MyComponents/CommentsInput.vue";
+import CommentsCard from "@/Components/MyComponents/CommentsCard.vue";
 import { useForm, Link } from "@inertiajs/vue3";
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -96,7 +95,6 @@ import { es } from 'date-fns/locale';
 export default {
     data() {
         const form = useForm({
-            notes: this.support_report.notes ?? '',
             status: this.support_report.status,
         });
 
@@ -112,22 +110,26 @@ export default {
         Back,
         Link,
         CommentsInput,
+        CommentsCard,
     },
     props: {
         support_report: Object,
         admins: Array,
     },
     methods: {
+        addNewComment(newComment) {
+            this.support_report.comments.push(newComment);
+        },
         formatDateTime(dateTime) {
             let parsedDate = new Date(dateTime);
 
             return format(parsedDate, 'd MMM, y • hh:mm a', { locale: es }); // Formato personalizado
         },
-        update() {
+        changeStatus() {
             this.form.put(route('support-reports.update', this.support_report.id), {
                 onSuccess: () => {
                     this.$notify({
-                        title: "Correcto",
+                        title: "Estado cambiado",
                         message: "",
                         type: "success",
                     });
