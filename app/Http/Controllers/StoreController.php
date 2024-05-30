@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 
 class StoreController extends Controller
 {
+    private $departments_can_see_all_stores = ['Dirección', 'Gerente de ventas'];
+
     public function index()
     {
         // Obtener todos los vendedores y seleccionar solo las columnas id y name
@@ -19,8 +21,12 @@ class StoreController extends Controller
             return ['label' => $seller->name, 'value' => $seller->id];
         })->values()->all();
 
+        // obtener las tiendas dependiendo del departamento del admin
         $stores = Store::latest('id')
             ->with(['user', 'seller', 'lastPayment.media'])
+            ->when(!in_array(auth()->user()->employee_properties['department'], $this->departments_can_see_all_stores), function ($query) {
+                $query->where('seller_id', auth()->id());
+            })
             ->get()
             ->take(30);
 
@@ -64,8 +70,12 @@ class StoreController extends Controller
 
     public function getMatches($query)
     {
-        $stores = Store::query()
+
+        $stores = Store::latest()
             ->with(['user', 'seller'])
+            ->when(!in_array(auth()->user()->employee_properties['department'], $this->departments_can_see_all_stores), function ($query) {
+                $query->where('seller_id', auth()->id());
+            })
             ->where('id', 'LIKE', "%$query%")
             ->orWhere('name', 'LIKE', "%$query%")
             ->orWhere('contact_name', 'LIKE', "%$query%")
@@ -76,8 +86,11 @@ class StoreController extends Controller
 
     public function getFilters($prop, $value)
     {
-        $stores = Store::query()
+        $stores = Store::latest()
             ->with(['user', 'seller'])
+            ->when(!in_array(auth()->user()->employee_properties['department'], $this->departments_can_see_all_stores), function ($query) {
+                $query->where('seller_id', auth()->id());
+            })
             ->where($prop, $value)
             ->get();
 
@@ -90,6 +103,9 @@ class StoreController extends Controller
 
         $stores = Store::latest('id')
             ->with(['user', 'seller'])
+            ->when(!in_array(auth()->user()->employee_properties['department'], $this->departments_can_see_all_stores), function ($query) {
+                $query->where('seller_id', auth()->id());
+            })
             ->get()
             ->skip($offset)
             ->take(30);
@@ -129,7 +145,7 @@ class StoreController extends Controller
 
         return response()->json([]);
     }
-    
+
     public function asignSeller(Request $request, Store $store)
     {
         // Actualizar el modelo Store con el nuevo seller_id

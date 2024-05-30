@@ -24,26 +24,29 @@
             </section>
 
             <Loading v-if="loading" class="mt-20" />
-            <div v-else class="mt-8">
-                <p v-if="localStores.length" class="text-gray66 text-[11px] mb-2">{{ localStores.length }}
-                    de {{
-                        total_stores }}
-                    elementos
-                </p>
-                <StoresTable :items="localStores" :sellers="sellers" />
-                <p v-if="localStores.length" class="text-gray66 text-[11px] mt-1">{{ localStores.length }}
-                    de {{
-                        total_stores }}
-                    elementos
-                </p>
-                <p v-if="loadingItems" class="text-xs my-4 text-center">
-                    Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-secondary"></i>
-                </p>
-                <button
-                    v-else-if="localStores.length && !search && !filtered && (total_stores > 10 && localStores.length < total_stores)"
-                    @click="fetchItemsByPage"
-                    class="w-full text-secondary my-4 text-xs mx-auto underline ml-6">Cargar más elementos</button>
-            </div>
+            <section v-else class="mt-8">
+                <div v-if="localStores.length">
+                    <p class="text-gray66 text-[11px] mb-2">{{ localStores.length }}
+                        de {{
+                            total_stores }}
+                        elementos
+                    </p>
+                    <StoresTable :items="localStores" :sellers="sellers" />
+                    <p class="text-gray66 text-[11px] mt-1">{{ localStores.length }}
+                        de {{
+                            total_stores }}
+                        elementos
+                    </p>
+                    <p v-if="loadingItems" class="text-xs my-4 text-center">
+                        Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-secondary"></i>
+                    </p>
+                    <button
+                        v-else-if="!search && !filtered && (total_stores > 10 && localStores.length < total_stores)"
+                        @click="fetchItemsByPage"
+                        class="w-full text-secondary my-4 text-xs mx-auto underline ml-6">Cargar más elementos</button>
+                </div>
+                <el-empty v-else description="No hay tiendas para mostrar" />
+            </section>
         </div>
     </AppLayout>
 </template>
@@ -72,11 +75,23 @@ export default {
             options: [
                 {
                     label: "Tipo de suscripción ",
-                    value: "store_period",
+                    value: "suscription_period",
                     children: [
+                        {
+                            label: 'Periodo de prueba',
+                            value: 'Periodo de prueba',
+                        },
                         {
                             label: 'Mensual',
                             value: 'Mensual',
+                        },
+                        {
+                            label: 'Trimestral',
+                            value: 'Trimestral',
+                        },
+                        {
+                            label: 'Semestral',
+                            value: 'Semestral',
                         },
                         {
                             label: 'Anual',
