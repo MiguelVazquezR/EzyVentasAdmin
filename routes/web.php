@@ -3,8 +3,10 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\GlobalProductController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\SettingHistoryController;
 use App\Http\Controllers\SupportReportController;
 use App\Http\Controllers\StoreController;
 use Illuminate\Foundation\Application;
@@ -38,9 +40,12 @@ Route::post('admins/update-with-media/{admin}', [AdminController::class, 'update
 // stores routes-----------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------
 Route::resource('stores', StoreController::class)->middleware('web');
+Route::get('stores-support/{store}', [StoreController::class, 'support'])->name('stores.support')->middleware(['auth']);
 Route::get('stores-get-by-page/{currentPage}', [StoreController::class, 'getItemsByPage'])->name('stores.get-by-page')->middleware('auth');
 Route::get('stores-get-matches/{query}', [StoreController::class, 'getMatches'])->name('stores.get-matches');
 Route::get('stores-get-filters/{prop}/{value}', [StoreController::class, 'getFilters'])->name('stores.get-filters');
+Route::get('stores-get-settings-by-module/{store}/{module}', [StoreController::class, 'getSettingsByModule'])->middleware('auth')->name('stores.get-settings-by-module');
+Route::put('stores/toggle-setting-value/{store}/{setting_id}', [StoreController::class, 'toggleSettingValue'])->middleware('auth')->name('stores.toggle-setting-value');
 Route::put('stores-asign-seller/{store}', [StoreController::class, 'asignSeller'])->name('stores.asign-seller');
 
 
@@ -64,6 +69,16 @@ Route::resource('categories', CategoryController::class)->middleware('auth');
 Route::resource('brands', BrandController::class)->middleware('auth');
 
 
+//setting history routes------------------------------------------------------------------------------------------  
+//-------------------------------------------------------------------------------------------------------
+Route::get('setting-histories-get-by-store/{store}', [SettingHistoryController::class, 'getByStore'])->middleware('auth')->name('setting-histories.get-by-store');
+
+
+//comments routes------------------------------------------------------------------------------------------  
+//-------------------------------------------------------------------------------------------------------
+Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
+
+
 //Payments routes------------------------------------------------------------------------------------------  
 //---------------------------------------------------------------------------------------------------------
 Route::resource('payments', PaymentController::class)->middleware('auth');
@@ -75,6 +90,4 @@ Route::put('payments/validate/{payment}', [PaymentController::class, 'validatePa
 Route::resource('support-reports', SupportReportController::class)->middleware('auth');
 Route::get('support-reports-get-by-page/{currentPage}', [SupportReportController::class, 'getItemsByPage'])->name('support-reports.get-by-page')->middleware('auth');
 Route::get('support-reports-get-matches/{query}', [SupportReportController::class, 'getMatches'])->name('support-reports.get-matches');
-Route::get('support-reports-get-matches/{query}', [SupportReportController::class, 'getMatches'])->name('support-reports.get-matches');
-Route::put('support-reports-change-status/{support_report}/{status}', [SupportReportController::class, 'changeStatus'])->name('support-reports.change-status');
 Route::get('support-reports-get-by-page/{currentPage}', [SupportReportController::class, 'getItemsByPage'])->name('support-reports.get-by-page')->middleware('auth');

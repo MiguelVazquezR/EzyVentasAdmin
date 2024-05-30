@@ -19,23 +19,22 @@ class SupportReport extends Model implements HasMedia
         'status',
         'notes',
         'user_id',
-        // 'seller_id', ya lo tiene la tienda.
         'store_id',
     ];
 
     // relaciones
-    public function user() :BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
-    
-    // public function seller() :BelongsTo
-    // {
-    //     return $this->belongsTo(User::class);
-    // }
 
-    public function store() :BelongsTo
+    public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class);
+    }
+
+    public function comments()
+    {
+        return $this->morphMany(Comment::class, 'commentable');
     }
 }

@@ -15,7 +15,7 @@
                     no-match-text="No se encontraron coincidencias" class="md:!w-1/3">
                     <el-option v-for="item in stores" :key="item" :label="item.name" :value="item.id" />
                 </el-select>
-                <PrimaryButton>Dar soporte</PrimaryButton>
+                <PrimaryButton @click="$inertia.visit(route('stores.support', store))">Dar soporte</PrimaryButton>
             </div>
 
             <h1 class="flex items-center justify-center font-bold mt-2">

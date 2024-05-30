@@ -17,7 +17,7 @@
                 </figure>
                 </Link>
             </div>
-            <nav class="pr-2 pt-20 text-white">
+            <nav class="pr-2 text-white">
                 <!-- Con barra pequeña -->
                 <template v-if="small">
                     <div v-for="(menu, index) in menus" :key="index">
