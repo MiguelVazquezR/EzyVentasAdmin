@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\GlobalProductController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\SettingHistoryController;
@@ -73,6 +74,11 @@ Route::resource('brands', BrandController::class)->middleware('auth');
 Route::get('setting-histories-get-by-store/{store}', [SettingHistoryController::class, 'getByStore'])->middleware('auth')->name('setting-histories.get-by-store');
 
 
+//comments routes------------------------------------------------------------------------------------------  
+//-------------------------------------------------------------------------------------------------------
+Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
+
+
 //Payments routes------------------------------------------------------------------------------------------  
 //---------------------------------------------------------------------------------------------------------
 Route::resource('payments', PaymentController::class)->middleware('auth');
@@ -84,6 +90,4 @@ Route::put('payments/validate/{payment}', [PaymentController::class, 'validatePa
 Route::resource('support-reports', SupportReportController::class)->middleware('auth');
 Route::get('support-reports-get-by-page/{currentPage}', [SupportReportController::class, 'getItemsByPage'])->name('support-reports.get-by-page')->middleware('auth');
 Route::get('support-reports-get-matches/{query}', [SupportReportController::class, 'getMatches'])->name('support-reports.get-matches');
-Route::get('support-reports-get-matches/{query}', [SupportReportController::class, 'getMatches'])->name('support-reports.get-matches');
-Route::put('support-reports-change-status/{support_report}/{status}', [SupportReportController::class, 'changeStatus'])->name('support-reports.change-status');
 Route::get('support-reports-get-by-page/{currentPage}', [SupportReportController::class, 'getItemsByPage'])->name('support-reports.get-by-page')->middleware('auth');
