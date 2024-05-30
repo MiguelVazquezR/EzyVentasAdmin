@@ -121,20 +121,21 @@ export default {
                 const store = this.items.find(item => item.id == itemId).store;
                 this.$inertia.visit(route('stores.support', store.id));
             } else if (commandName == 'process' || commandName == 'solved') {
-                this.changeStatus(commandName, itemId);
+                const status = commandName == 'solved'
+                ? 'Resuelto'
+                : 'En proceso';
+
+                this.changeStatus(status, itemId);
             }
         },
-        async changeStatus(commandName, itemId) {
+        async changeStatus(status, itemId) {
             try {
-                const response = await axios.put((route('support-reports.change-status', [itemId, commandName])));
+                const response = await axios.put((route('support-reports.change-status', [itemId, status])));
                 if (response.status == 200) {
                     const itemIndex = this.items.findIndex(item => item.id == itemId);
                     if (itemIndex != -1) {
-                        if (commandName == 'process') {
-                            this.items[itemIndex].status = 'En proceso';
-                        } else {
-                            this.items[itemIndex].status = 'Resuelto';
-                        }
+                        this.items[itemIndex].status = status;
+                        
                         this.$notify({
                             title: "Éxito",
                             message: "Se ha cambiado el estatus",

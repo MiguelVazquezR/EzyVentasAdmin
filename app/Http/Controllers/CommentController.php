@@ -12,13 +12,6 @@ class CommentController extends Controller
 {
     public function store(Request $request)
     {
-        // $request->validate([
-        //     'comment' => 'required|string',
-        //     'commentable_type' => 'required|string',
-        //     'commentable_id' => 'required|integer',
-        //     'mentions' => 'nullable|array'
-        // ]);
-
         // Determine the model class from the request
         $modelClass = $request->commentable_type;
         $modelId = $request->commentable_id;
@@ -47,7 +40,7 @@ class CommentController extends Controller
         // Notify mentioned admins
         $this->notifyMentions($request->mentions, $model);
 
-        return response()->json(['item' => $comment->fresh('admin')]);
+        return response()->json(['item' => $comment->fresh('admin:id,name,profile_photo_path')]);
     }
 
     protected function notifyStoreResponsible($supportReport)
