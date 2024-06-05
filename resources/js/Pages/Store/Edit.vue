@@ -9,7 +9,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import InputLabel from "@/Components/InputLabel.vue";
 import Loading from '@/Components/MyComponents/Loading.vue';
-import SuscriptionsTable from '@/Components/MyComponents/Suscription/SuscriptionsTable.vue';
+import StoresTable from '@/Components/MyComponents/Store/StoresTable.vue';
 import axios from 'axios';
 
 export default {
@@ -23,10 +23,10 @@ export default {
         PrimaryButton,
         InputLabel,
         Loading,
-        SuscriptionsTable,
+        StoresTable,
     },
     props: {
-        suscription: Object,
+        store: Object,
     },
     methods: {
         

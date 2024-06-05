@@ -12,7 +12,7 @@
             <div v-for="product in products" :key="product.id" class="*:px-2 *:py-1 cursor-pointer flex items-center space-x-4 border rounded-full mb-2 hover:border-primary" 
             @click="$inertia.get(route('global-products.show', product.id))">
                 <div class="hidden md:block w-[10%] h-14 rounded-l-full">
-                    <img class="mx-auto h-12 object-contain rounded-lg" :src="product.media[0]?.original_url">
+                    <img class="mx-auto h-12 object-contain rounded-lg" :src="procesarUrlImagen(product.media[0]?.original_url)">
                 </div>
                 <div class="w-[18%] md:w-[13%]">{{ product.code ?? 'N/A' }}</div>
                 <div class="w-[30%] md:w-[20%]">{{ product.name }}</div>
@@ -72,7 +72,14 @@ methods:{
                 position: 'top-right',
             });
         }
-    }
+    },
+    // Método para procesar la URL de la imagen manda a la ruta de la app.
+    procesarUrlImagen(originalUrl) {
+        // Reemplaza la parte inicial de la URL
+        const nuevaUrl = originalUrl.replace('https://admin.ezyventas.com/', 'https://ezyventas.com/');
+        // const nuevaUrl = originalUrl.replace('http://localhost:8000', 'https://ezyventas.com/'); //para hacer pruebas en local
+        return nuevaUrl;
+    },
 }
 }
 </script>

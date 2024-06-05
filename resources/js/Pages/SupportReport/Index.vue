@@ -27,15 +27,11 @@
             <Loading v-if="loading" class="mt-20" />
             <div v-else class="mt-8">
                 <p v-if="localReports.length" class="text-gray66 text-[11px] mb-2">{{ localReports.length }}
-                    de {{
-                        total_reports }}
-                    elementos
+                    de {{ total_reports }} elementos
                 </p>
-                <SuscriptionsTable :items="localReports" />
+                <ReportsTable :items="localReports" />
                 <p v-if="localReports.length" class="text-gray66 text-[11px] mt-1">{{ localReports.length }}
-                    de {{
-                        total_reports }}
-                    elementos
+                    de {{ total_reports }} elementos
                 </p>
                 <p v-if="loadingItems" class="text-xs my-4 text-center">
                     Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-secondary"></i>
@@ -54,7 +50,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import InputLabel from "@/Components/InputLabel.vue";
 import Loading from '@/Components/MyComponents/Loading.vue';
-import SuscriptionsTable from '@/Components/MyComponents/Suscription/SuscriptionsTable.vue';
+import ReportsTable from '@/Components/MyComponents/SupportReport/ReportsTable.vue';
 import axios from 'axios';
 
 export default {
@@ -70,50 +66,11 @@ export default {
             showFilter: false, //filtro opciones
             loadingItems: false, //para paginación
             currentPage: 1, //para paginación
-            // options: [
-            //     {
-            //         label: "Tipo de suscripción ",
-            //         value: "suscription_period",
-            //         children: [
-            //             {
-            //                 label: 'Mensual',
-            //                 value: 'Mensual',
-            //             },
-            //             {
-            //                 label: 'Anual',
-            //                 value: 'Anual',
-            //             },
-            //         ],
-            //     },
-            //     {
-            //         label: "Vendedor",
-            //         value: "seller_id",
-            //         children: this.sellers,
-            //     },
-            //     {
-            //         label: "Estatus",
-            //         value: "status",
-            //         children: [
-            //             {
-            //                 label: 'Pagado',
-            //                 value: 'Pagado',
-            //             },
-            //             {
-            //                 label: 'Próximo a vencer ',
-            //                 value: 'Próximo a vencer ',
-            //             },
-            //             {
-            //                 label: 'Vencido',
-            //                 value: 'Vencido',
-            //             },
-            //         ],
-            //     },
-            // ],
         }
     },
     components: {
         AppLayout,
-        SuscriptionsTable,
+        ReportsTable,
         PrimaryButton,
         InputLabel,
         Loading,
@@ -186,7 +143,7 @@ export default {
         async fetchFiltered() {
             try {
                 this.loading = true;
-                const response = await axios.get(route('suscriptions.get-filters', { prop: this.filter[0], value: this.filter[1] }));
+                const response = await axios.get(route('stores.get-filters', { prop: this.filter[0], value: this.filter[1] }));
 
                 if (response.status === 200) {
                     // si el bufer no tiene nada aun, guardar las suscripciones
@@ -205,7 +162,7 @@ export default {
         async fetchItemsByPage() {
             try {
                 this.loadingItems = true;
-                const response = await axios.get(route('suscriptions.get-by-page', this.currentPage));
+                const response = await axios.get(route('stores.get-by-page', this.currentPage));
 
                 if (response.status === 200) {
                     this.localReports = { ...this.localReports, ...response.data.items };
