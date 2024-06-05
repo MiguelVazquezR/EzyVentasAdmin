@@ -37,9 +37,9 @@
                     </td>
                     <td>
                         <div class="flex items-center space-x-2">
-                            <el-tooltip :content="getTooltipContent(item.next_payment)" placement="left">
+                            <!-- <el-tooltip :content="getTooltipContent(item.next_payment)" placement="left">
                                 <i class="fa-solid fa-circle text-[8px]" :style="{ color: getStatusColor(item.next_payment) }"></i>
-                            </el-tooltip>
+                            </el-tooltip> -->
                             <span>{{ formatDateTime(item.next_payment) }}</span>
                         </div>
                     </td>
@@ -342,34 +342,34 @@ export default {
             }
             return 'fa-regular fa-clock text-amber-400';
         },
-        getStatusColor(nextPaymentDate) {
-            const today = new Date();
-            const nextPayment = new Date(nextPaymentDate);
-            const diffTime = nextPayment - today;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convertir a días
+        // getStatusColor(nextPaymentDate) {
+        //     const today = new Date();
+        //     const nextPayment = new Date(nextPaymentDate);
+        //     const diffTime = nextPayment - today;
+        //     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convertir a días
 
-            if (diffDays < 0) {
-                return 'red'; // Vencida
-            } else if (diffDays <= 5) {
-                return 'orange'; // Próxima a vencer
-            } else {
-                return '#59FB31'; // Pagada
-            }
-        },
-        getTooltipContent(nextPaymentDate) {
-            const today = new Date();
-            const nextPayment = new Date(nextPaymentDate);
-            const diffTime = nextPayment - today;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convertir a días
+        //     if (diffDays < 0) {
+        //         return 'red'; // Vencida
+        //     } else if (diffDays <= 5) {
+        //         return 'orange'; // Próxima a vencer
+        //     } else {
+        //         return '#59FB31'; // Pagada
+        //     }
+        // },
+        // getTooltipContent(nextPaymentDate) {
+        //     const today = new Date();
+        //     const nextPayment = new Date(nextPaymentDate);
+        //     const diffTime = nextPayment - today;
+        //     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convertir a días
 
-            if (diffDays < 0) {
-                return 'Vencida';
-            } else if (diffDays <= 5) {
-                return 'Próxima a vencer';
-            } else {
-                return 'Pagada';
-            }
-        },
+        //     if (diffDays < 0) {
+        //         return 'Vencida';
+        //     } else if (diffDays <= 5) {
+        //         return 'Próxima a vencer';
+        //     } else {
+        //         return 'Pagada';
+        //     }
+        // },
         async asignSeller() {
             try {
                 const response = await axios.put(route('stores.asign-seller', this.storeId), {sellerId: this.asignedSeller});
