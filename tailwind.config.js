@@ -25,6 +25,7 @@ export default {
                 redDanger: '#F80505',
                 greenSuccess: '#278E16',
                 black1: '#1A1A1A',
+                gray9A: '#9A9A9A',
                 gray66: '#666666',
                 grayD9: '#D9D9D9',
                 gray99: '#999999',

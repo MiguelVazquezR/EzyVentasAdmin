@@ -70,7 +70,6 @@ class StoreController extends Controller
 
     public function getMatches($query)
     {
-
         $stores = Store::latest()
             ->with(['user', 'seller'])
             ->when(!in_array(auth()->user()->employee_properties['department'], $this->departments_can_see_all_stores), function ($query) {
