@@ -70,7 +70,7 @@ class PaymentController extends Controller
 
         // notificar a cliente de validacion de pago
         $title = "Respuesta a pago registrado";
-        $description = "Tu pago creado el {$payment->created_at->isoFormat('ddd DD MMMM, Y')} tiene un estatus de <b class='text-primary'>$payment->status</b>";
+        $description = "La suscripción de \"$store->name\" ha sido aprobada y esta activa. <br> Ahora puedes seguir utilizando el sistema con total normalidad.";
         if (app()->environment() === 'local'){
             $url = 'http://localhost:8000/user/profile';
         } else {

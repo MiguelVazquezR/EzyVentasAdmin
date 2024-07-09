@@ -44,7 +44,7 @@ class StoreBasicNotification extends Notification
                 'greeting' => '¡Hola!',
                 'description' => $this->description,
                 'url' => $this->url,
-                'salutation' => 'Saludos',
+                'salutation' => 'Saludos cordiales,',
             ]);
     }
 
