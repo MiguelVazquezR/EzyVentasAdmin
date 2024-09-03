@@ -1,5 +1,5 @@
 <template>
-    <div v-if="products.length" class="w-full mx-auto text-[11px] md:text-sm overflow-auto">
+    <div v-if="products?.length" class="w-full mx-auto text-[11px] md:text-sm overflow-auto">
         <div class="text-center md:text-base flex items-center space-x-4 mb-2">
             <div class="hidden md:block w-[10%]"></div>
             <div class="font-bold pb-3 pl-2 text-left w-[18%] md:w-[13%]">Código</div>
@@ -75,10 +75,12 @@ methods:{
     },
     // Método para procesar la URL de la imagen manda a la ruta de la app.
     procesarUrlImagen(originalUrl) {
-        // Reemplaza la parte inicial de la URL
-        const nuevaUrl = originalUrl.replace('https://admin.ezyventas.com/', 'https://ezyventas.com/');
-        // const nuevaUrl = originalUrl.replace('http://localhost:8000', 'https://ezyventas.com/'); //para hacer pruebas en local
-        return nuevaUrl;
+        if ( originalUrl ) {
+            // Reemplaza la parte inicial de la URL
+            const nuevaUrl = originalUrl.replace('https://admin.ezyventas.com/', 'https://ezyventas.com/');
+            // const nuevaUrl = originalUrl.replace('http://localhost:8000', 'https://ezyventas.com/'); //para hacer pruebas en local
+            return nuevaUrl;
+        }
     },
 }
 }

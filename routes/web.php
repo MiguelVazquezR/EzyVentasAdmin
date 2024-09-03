@@ -54,9 +54,10 @@ Route::put('stores-asign-seller/{store}', [StoreController::class, 'asignSeller'
 Route::resource('global-products', GlobalProductController::class)->middleware('auth');
 Route::get('global-products-search', [GlobalProductController::class, 'searchProduct'])->name('global-products.search')->middleware('auth');
 Route::post('global-products/update-with-media/{global_product}', [GlobalProductController::class, 'updateWithMedia'])->name('global-products.update-with-media')->middleware('auth');
-Route::get('global-products-get-by-page/{currentPage}', [GlobalProductController::class, 'getItemsByPage'])->name('global-products.get-by-page')->middleware('auth');
+Route::post('global-products-get-by-page/{currentPage}', [GlobalProductController::class, 'getItemsByPage'])->name('global-products.get-by-page')->middleware('auth');
 Route::get('global-products-fetch-product-info/{global_product_id}', [GlobalProductController::class, 'fetchProductInfo'])->name('global-products.fetch-info-product')->middleware('auth');
 Route::get('global-products-filter', [GlobalProductController::class, 'filter'])->name('global-products.filter')->middleware('auth');
+Route::get('global-products-fetch-for-type/{type}', [GlobalProductController::class, 'fetchForType'])->name('global-products.fetch-for-type')->middleware('auth');
 
 
 //categories routes--------------------------------------------------------------------------------------

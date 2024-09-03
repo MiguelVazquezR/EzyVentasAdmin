@@ -5,19 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\GlobalProduct;
-use App\Models\GlobalProductStore;
-use App\Models\Product;
 use Illuminate\Http\Request;
 
 class GlobalProductController extends Controller
 {
     public function index()
     {   
-        $global_products = GlobalProduct::with(['media', 'category'])->get()->take(20);;
-        $total_products = GlobalProduct::all()->count();
+        // $global_products = GlobalProduct::with(['media', 'category'])->get()->take(20);
+        // $total_products = GlobalProduct::all()->count();
 
-        // return $global_products;
-        return inertia('GlobalProduct/Index', compact('global_products', 'total_products'));
+        // return inertia('GlobalProduct/Index', compact('global_products', 'total_products'));
+        return inertia('GlobalProduct/Index');
     }
 
     
@@ -36,8 +34,9 @@ class GlobalProductController extends Controller
             'name' => 'required|string|max:100|unique:global_products,name',
             'code' => 'nullable|string|max:100|unique:global_products,code',
             'public_price' => 'required|string|max:200',
-            'category_id' => 'required',
-            'brand_id' => 'required',
+            'type' => 'required|string|max:100',
+            'category_id' => 'nullable',
+            'brand_id' => 'nullable',
         ]);
 
         $global_product = GlobalProduct::create($request->except('imageCover'));
@@ -76,8 +75,9 @@ class GlobalProductController extends Controller
             'name' => 'required|string|max:100|unique:global_products,name,'.$global_product->id,
             'code' => 'nullable|string|max:100|unique:global_products,code,'.$global_product->id,
             'public_price' => 'required|max:200',
-            'category_id' => 'required',
-            'brand_id' => 'required',
+            'type' => 'nullable|string|max:100',
+            'category_id' => 'nullable',
+            'brand_id' => 'nullable',
         ]);
 
         $global_product->update($request->except('imageCover'));
@@ -98,8 +98,9 @@ class GlobalProductController extends Controller
             'name' => 'required|string|max:100|unique:global_products,name,'.$global_product->id,
             'code' => 'nullable|string|max:100|unique:global_products,code,'.$global_product->id,
             'public_price' => 'required|max:200',
-            'category_id' => 'required',
-            'brand_id' => 'required',
+            'type' => 'nullable|string|max:100',
+            'category_id' => 'nullable',
+            'brand_id' => 'nullable',
         ]);
 
         $global_product->update($request->except('imageCover'));
@@ -126,9 +127,11 @@ class GlobalProductController extends Controller
 
 
     public function getItemsByPage($currentPage)
-    {
+    {   
+        $type = request('type');
         $offset = $currentPage * 20;
         $global_products = GlobalProduct::with('category', 'media', 'brand')
+            ->where('type', 'like', "%$type%")
             ->latest()
             ->skip($offset)
             ->take(20)
@@ -184,5 +187,13 @@ class GlobalProductController extends Controller
             ->get();
 
         return response()->json(['items' => $global_products]);
+    }
+
+    public function fetchForType($type)
+    {   
+        $global_products = GlobalProduct::with(['media', 'category'])->where('type', 'like', "%$type%")->latest()->get()->take(20);
+        $total_products = GlobalProduct::with(['media', 'category'])->where('type', 'like', "%$type%")->get()->count();
+
+        return response()->json(compact('global_products', 'total_products'));
     }
 }

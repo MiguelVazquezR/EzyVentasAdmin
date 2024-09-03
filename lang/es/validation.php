@@ -142,5 +142,6 @@ return [
         'phone' => 'teléfono',
         'disabled_date' => 'fecha de baja',
         'disabled_reason' => 'motivo de baja',
+        'type' => 'tipo',
     ],
 ];
