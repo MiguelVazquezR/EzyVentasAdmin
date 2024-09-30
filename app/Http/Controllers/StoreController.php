@@ -47,7 +47,7 @@ class StoreController extends Controller
 
     public function show($store_id)
     {
-        $store = Store::with(['seller', 'payments'])->find($store_id);
+        $store = Store::with(['seller', 'payments.media', 'media'])->find($store_id);
         $stores = Store::latest('id')->get(['id', 'name']);
 
         return inertia('Store/Show', compact('store', 'stores'));
