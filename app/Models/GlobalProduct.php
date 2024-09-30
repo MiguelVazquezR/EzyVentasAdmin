@@ -16,6 +16,7 @@ class GlobalProduct extends Model implements HasMedia
     protected $fillable = [
         'name',
         'public_price',
+        'type',
         'code',
         'category_id',
         'brand_id',

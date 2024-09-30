@@ -7,21 +7,30 @@
                     <th>Tipo de suscripción</th>
                     <th>Método de pago</th>
                     <th>Monto</th>
-                    <th>Estatus</th>
+                    <th>Estatus de pago</th>
+                    <th>Estatus de factura</th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="item in store.payments" :key="item" class="*:text-xs *:py-2 *:px-4 hover:bg-primarylight">
+                <tr v-for="(item, index) in store.payments" :key="item" @click="openDetailsModal(index)"
+                    class="*:text-xs *:py-2 *:px-4 hover:bg-primarylight cursor-pointer">
                     <td class="rounded-s-full">{{ formatDate(item.created_at) }}</td>
                     <td>{{ item.suscription_period }}</td>
                     <td>{{ item.payment_method }}</td>
                     <td>${{ item.amount?.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",") }}</td>
                     <td>
                         <p :class="{
-                                'text-greenSuccess': item.status == 'Aprobado',
-                                'text-redDanger': item.status == 'Rechazado',
-                                'text-amber-500': item.status == 'En revisión',
-                            }">{{ item.status }}</p>
+                            'text-greenSuccess': item.status == 'Aprobado',
+                            'text-redDanger': item.status == 'Rechazado',
+                            'text-amber-500': item.status == 'En revisión',
+                        }">{{ item.status }}</p>
+                    </td>
+                    <td>
+                        <p :class="{
+                            'text-greenSuccess': item.invoice_status == 'Enviada',
+                            'text-gray99': item.invoice_status == 'No solicitada',
+                            'text-amber-500': item.invoice_status == 'Solicitada',
+                        }">{{ item.invoice_status }}</p>
                     </td>
                     <td class="rounded-e-full text-end">
                         <!-- <el-dropdown trigger="click" @command="handleCommand">
@@ -59,7 +68,7 @@
                                     </el-dropdown-item>
                                 </el-dropdown-menu>
                             </template>
-                        </el-dropdown> -->
+</el-dropdown> -->
                     </td>
                 </tr>
             </tbody>
@@ -72,12 +81,60 @@
             <h1>Detalles de pago</h1>
         </template>
         <template #content>
-            contenido de detalles
+            <section>
+                <h1 class="font-bold">Datos generales del pago</h1>
+                <span>...</span>
+            </section>
+            <section class="mt-6">
+                <h1 class="font-bold">Factura</h1>
+                <div v-if="getStoreCSF">
+                    <p>
+                        <span>Actualmente contamos con una constancia registrada. </span> <br>
+                        <a :href="getStoreCSF.original_url" target="_blank" class="text-primary">
+                            Ver contancia de situación fiscal
+                        </a>
+                    </p>
+
+                    <div v-if="getSelectedPaymentInvoice" class="mt-6">
+                        <span>Ya se ha adjuntado la factura a este pago. </span> <br>
+                        <a :href="getSelectedPaymentInvoice.original_url" target="_blank" class="text-primary">
+                            Ver factura
+                        </a>
+                    </div>
+                    <div v-else class="mt-6">
+                        <InputLabel value="Subir factura (.zip o .rar)" />
+                        <FileUploader @files-selected="invoiceForm.invoice = $event" :multiple="false"
+                            acceptedFormat="comprimido" />
+                        <InputError :message="invoiceForm.errors.invoice" />
+                    </div>
+                </div>
+                <div v-else>
+                    <p>No ha registrada ninguna constancia de situación fiscal.</p>
+                </div>
+            </section>
         </template>
         <template #footer>
             <div class="flex items-center space-x-1">
-                <CancelButton @click="showDetailsModal = false">Cerrar</CancelButton>
-                <PrimaryButton>HEY</PrimaryButton>
+                <CancelButton @click="showDetailsModal = false" :disabled="invoiceForm.processing">Cerrar</CancelButton>
+                <el-popconfirm confirm-button-text="Si" cancel-button-text="No" icon-color="#373737"
+                    :title="'Se notificará al suscriptor, ¿continuar?'"
+                    @confirm="notifyFiscalDataError()">
+                    <template #reference>
+                        <PrimaryButton
+                            v-if="store.payments[selectedPaymentIndex].invoice_status != 'Enviada'"
+                            :disabled="invoiceForm.processing || notifying" class="!bg-red-700">
+                            <i v-if="notifying" class="fa-sharp fa-solid fa-circle-notch fa-spin mr-2 text-white"></i>
+                            Error en datos fiscales
+                        </PrimaryButton>
+                    </template>
+                </el-popconfirm>
+                <PrimaryButton @click="storeInvoice"
+                    v-if="store.payments[selectedPaymentIndex].invoice_status != 'Enviada'"
+                    :disabled="invoiceForm.processing || !invoiceForm.invoice.length">
+                    <i v-if="invoiceForm.processing"
+                        class="fa-sharp fa-solid fa-circle-notch fa-spin mr-2 text-white"></i>
+                    Subir factura
+                </PrimaryButton>
             </div>
         </template>
     </DialogModal>
@@ -89,24 +146,80 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DialogModal from '@/Components/DialogModal.vue';
 import { format, parseISO } from 'date-fns';
 import es from 'date-fns/locale/es';
+import { useForm } from "@inertiajs/vue3";
+import InputError from "@/Components/InputError.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import FileUploader from "@/Components/MyComponents/FileUploader.vue";
 
 export default {
     data() {
+        const invoiceForm = useForm({
+            invoice: [],
+        });
+
         return {
+            invoiceForm,
             showDetailsModal: false,
+            selectedPaymentIndex: null,
             rejectedReazon: null,
             itemToShow: null,
+            notifying: false,
         }
     },
     components: {
         DialogModal,
         CancelButton,
         PrimaryButton,
+        InputError,
+        InputLabel,
+        FileUploader,
     },
     props: {
         store: Object
     },
+    computed: {
+        getStoreCSF() {
+            return this.store.media.find(item => item.collection_name == 'csf');
+        },
+        getSelectedPaymentInvoice() {
+            return this.store.payments[this.selectedPaymentIndex].media.find(item => item.collection_name == 'invoice');
+        },
+    },
     methods: {
+        storeInvoice() {
+            this.invoiceForm.post(route('payments.store-invoice', this.store.payments[this.selectedPaymentIndex]), {
+                onSuccess: () => {
+                    this.invoiceForm.reset();
+                    this.showDetailsModal = false;
+                    this.$notify({
+                        title: "Factura guardada",
+                        type: "success"
+                    });
+                }
+            });
+        },
+        notifyFiscalDataError() {
+            this.invoiceForm.put(route('payments.notify-fiscal-data-error', this.store.payments[this.selectedPaymentIndex]), {
+                onStart: () => {
+                    this.notifying = true;
+                },
+                onSuccess: () => {
+                    this.invoiceForm.reset();
+                    this.showDetailsModal = false;
+                    this.$notify({
+                        title: "Notificación enviada a suscriptor",
+                        type: "success"
+                    });
+                },
+                onFinish: () => {
+                    this.notifying = false;
+                },
+            });
+        },
+        openDetailsModal(paymentIndex) {
+            this.selectedPaymentIndex = paymentIndex;
+            this.showDetailsModal = true;
+        },
         formatDate(dateString) {
             return format(parseISO(dateString), 'dd MMMM yyyy • hh:mm a', { locale: es });
         },
@@ -120,10 +233,10 @@ export default {
                 this.itemToShow = item;
             } else if (commandName == 'approve') {
                 this.$inertia.put(route('payments.update-status', itemId), { status: 'Aprobado', rejected_reazon: null });
-                this.item.status = 'Aprobado'; 
+                this.item.status = 'Aprobado';
             } else if (commandName == 'reject') {
                 this.$inertia.put(route('payments.update-status', itemId), { status: 'Rechazado', rejected_reazon: this.rejectedReazon });
-                this.item.status = 'Rechazado'; 
+                this.item.status = 'Rechazado';
             }
         },
     }

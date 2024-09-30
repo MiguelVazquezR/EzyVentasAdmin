@@ -19,7 +19,11 @@ export default {
         }
     },
     props: {
-        file: Object
+        file: Object,
+        url: {
+            type: String,
+            default: null
+        }
     },
     methods: {
         getFileTypeIcon() {
@@ -44,8 +48,12 @@ export default {
             }
         },
         openFile() {
-            // Aquí asumimos que file.url es la URL del archivo que quieres abrir
-            const fileUrl = this.file.original_url;
+            let fileUrl = this.file.original_url;
+            
+            // sobreescribir la url por defecto
+            if (this.url) {
+                fileUrl = this.url;
+            }
 
             // Verificamos si la URL está presente antes de intentar abrir una nueva pestaña
             if (fileUrl) {
