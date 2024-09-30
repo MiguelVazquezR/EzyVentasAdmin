@@ -44,9 +44,9 @@ class PaymentController extends Controller
         $title = "Factura disponible";
         $description = "La factura solicitada del pago con folio #$payment->id está lista para descargar.";
         if (app()->environment() === 'local') {
-            $url = 'http://localhost:8000/user/payments';
+            $url = 'http://localhost:8000/payments';
         } else {
-            $url = 'https://ezyventas.com/user/payments';
+            $url = 'https://ezyventas.com/payments';
         }
         $payment->store->user->notify(new StoreBasicNotification($title, $description, $url));
     }
