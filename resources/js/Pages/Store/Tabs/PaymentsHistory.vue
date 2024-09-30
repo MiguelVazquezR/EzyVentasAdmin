@@ -91,14 +91,14 @@
                     <p>
                         <span>Actualmente contamos con una constancia registrada. </span> <br>
                         <a :href="getStoreCSF.original_url" target="_blank" class="text-primary">
-                            Ver Contancia de situación fiscal
+                            Ver contancia de situación fiscal
                         </a>
                     </p>
 
                     <div v-if="getSelectedPaymentInvoice" class="mt-6">
                         <span>Ya se ha adjuntado la factura a este pago. </span> <br>
                         <a :href="getSelectedPaymentInvoice.original_url" target="_blank" class="text-primary">
-                            Ver Factura
+                            Ver factura
                         </a>
                     </div>
                     <div v-else class="mt-6">
@@ -116,7 +116,20 @@
         <template #footer>
             <div class="flex items-center space-x-1">
                 <CancelButton @click="showDetailsModal = false" :disabled="invoiceForm.processing">Cerrar</CancelButton>
-                <PrimaryButton @click="storeInvoice" v-if="store.payments[selectedPaymentIndex].invoice_status != 'Enviada'"
+                <el-popconfirm confirm-button-text="Si" cancel-button-text="No" icon-color="#373737"
+                    :title="'Se notificará al suscriptor, ¿continuar?'"
+                    @confirm="notifyFiscalDataError()">
+                    <template #reference>
+                        <PrimaryButton
+                            v-if="store.payments[selectedPaymentIndex].invoice_status != 'Enviada'"
+                            :disabled="invoiceForm.processing || notifying" class="!bg-red-700">
+                            <i v-if="notifying" class="fa-sharp fa-solid fa-circle-notch fa-spin mr-2 text-white"></i>
+                            Error en datos fiscales
+                        </PrimaryButton>
+                    </template>
+                </el-popconfirm>
+                <PrimaryButton @click="storeInvoice"
+                    v-if="store.payments[selectedPaymentIndex].invoice_status != 'Enviada'"
                     :disabled="invoiceForm.processing || !invoiceForm.invoice.length">
                     <i v-if="invoiceForm.processing"
                         class="fa-sharp fa-solid fa-circle-notch fa-spin mr-2 text-white"></i>
@@ -150,6 +163,7 @@ export default {
             selectedPaymentIndex: null,
             rejectedReazon: null,
             itemToShow: null,
+            notifying: false,
         }
     },
     components: {
@@ -182,6 +196,24 @@ export default {
                         type: "success"
                     });
                 }
+            });
+        },
+        notifyFiscalDataError() {
+            this.invoiceForm.put(route('payments.notify-fiscal-data-error', this.store.payments[this.selectedPaymentIndex]), {
+                onStart: () => {
+                    this.notifying = true;
+                },
+                onSuccess: () => {
+                    this.invoiceForm.reset();
+                    this.showDetailsModal = false;
+                    this.$notify({
+                        title: "Notificación enviada a suscriptor",
+                        type: "success"
+                    });
+                },
+                onFinish: () => {
+                    this.notifying = false;
+                },
             });
         },
         openDetailsModal(paymentIndex) {

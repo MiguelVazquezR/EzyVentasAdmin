@@ -84,6 +84,7 @@ Route::post('/comments', [CommentController::class, 'store'])->name('comments.st
 //---------------------------------------------------------------------------------------------------------
 Route::resource('payments', PaymentController::class)->middleware('auth');
 Route::put('payments/validate/{payment}', [PaymentController::class, 'validatePayment'])->name('payments.validate')->middleware('auth');
+Route::put('payments/notify-fiscal-data-error/{payment}', [PaymentController::class, 'notifyFiscalDataError'])->name('payments.notify-fiscal-data-error')->middleware('auth');
 Route::post('payments/store-invoice/{payment}', [PaymentController::class, 'storeInvoice'])->name('payments.store-invoice')->middleware('auth');
 
 

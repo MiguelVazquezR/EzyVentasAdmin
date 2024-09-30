@@ -19,7 +19,7 @@
                     <td class="rounded-s-full">{{ item.id }}</td>
                     <td class="flex items-center space-x-2">
                         <el-tooltip :content="item.status" placement="left">
-                            <i class="mr-1" :class="getStatusIcon( item.status)"></i>
+                            <i class="mr-1" :class="getStatusIcon(item.status)"></i>
                         </el-tooltip>
                         <p>{{ item.name }}</p>
                     </td>
@@ -27,7 +27,8 @@
                     <td>{{ item.user?.email ?? '-' }}</td>
                     <td>{{ formatDateTime(item.created_at) }}</td>
                     <td>
-                        <button v-if="item.last_payment" @click.stop="prepareSuscriptionModal(item)" class="flex items-center space-x-2">
+                        <button v-if="item.last_payment" @click.stop="prepareSuscriptionModal(item)"
+                            class="flex items-center space-x-2">
                             <el-tooltip :content="item.last_payment.status" placement="left">
                                 <i class="mr-1" :class="getPaymentStatusIcon(item.last_payment.status)"></i>
                             </el-tooltip>
@@ -71,8 +72,10 @@
                                         <span class="text-xs">Editar</span>
                                     </el-dropdown-item>
                                     <el-dropdown-item :command="'seller-' + item.id">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-[14px] mr-2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="1.5" stroke="currentColor" class="size-[14px] mr-2">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
                                         </svg>
                                         <span class="text-xs">Asignar vendedor</span>
                                     </el-dropdown-item>
@@ -96,100 +99,102 @@
 
     <!-- -------------- Modal detalles de suscripción (tienda) starts----------------------- -->
     <Modal :show="suscriptionDetailsModal" @close="suscriptionDetailsModal = false; form.reset()">
-      <div class="p-4 relative">
-        <i @click="suscriptionDetailsModal = false"
-          class="fa-solid fa-xmark text-xs cursor-pointer size-7 flex items-center justify-center absolute right-3"></i>
+        <div class="p-4 relative">
+            <i @click="suscriptionDetailsModal = false"
+                class="fa-solid fa-xmark text-xs cursor-pointer size-7 flex items-center justify-center absolute right-3"></i>
 
-        <form @submit.prevent="updatePaymentStatus" class="mt-5 mb-2 md:grid grid-cols-2 gap-3 text-sm">
-            <h2 class="font-bold col-span-full ml-4">Detalle de pago de suscripción</h2>
-            <div class="border border-[#D9D99D99] rounded-lg p-3 col-span-full">
-                <p class="mb-4">Información del contacto</p>
-                <p class="font-bold">Tienda:</p>
-                <p class="">{{ storeSelected.name }}</p>
+            <form @submit.prevent="updatePaymentStatus" class="mt-5 mb-2 md:grid grid-cols-2 gap-3 text-sm">
+                <h2 class="font-bold col-span-full ml-4">Detalle de pago de suscripción</h2>
+                <div class="border border-[#D9D99D99] rounded-lg p-3 col-span-full">
+                    <p class="mb-4">Información del contacto</p>
+                    <p class="font-bold">Tienda:</p>
+                    <p class="">{{ storeSelected.name }}</p>
 
-                <div class="mt-2 grid grid-cols-3 gap-x-3">
-                    <p class="font-bold">Contacto:</p>
-                    <p class="font-bold">Teléfono:</p>
-                    <p class="font-bold">Correo:</p>
-                    <p class="">{{ storeSelected.contact_name }}</p>
-                    <p class="">{{ storeSelected.contact_phone }}</p>
-                    <p class="">{{ storeSelected.user?.email ?? '-' }}</p>
-                </div>
-            </div>
-
-            <div class="mx-3 col-span-full">
-                <h2 class="font-bold">Información de la suscripción</h2>
-                
-                <div class="mt-3">
-                    <p class="font-bold">Fecha de suscripción:</p>
-                    <p class="">{{ formatDateTime(storeSelected.created_at) }}</p>
-                    <p class="font-bold pt-1">Tipo de suscripción:</p>
-                    <p class="">{{ storeSelected.suscription_period }}</p>
-                    <p class="font-bold pt-1">Comprobante de pago:</p>
-                    <div class="grid grid-cols-2 gap-2" v-if="storeSelected.last_payment?.media?.length > 0">
-                        <FileView v-for="file in storeSelected.last_payment?.media" :key="file" :file="file" />
-                    </div>
-                    <p v-else class=" text-gray-400 text-xs">No hay archivos adjuntos</p>
-                </div>
-                <div class="grid grid-cols-2 col-span-full gap-x-4 mt-2">
-                    <p class="pt-1 pl-2">Validación de pago:<i class="ml-2 text-xs" :class="getValidationIcon()"></i></p>
-                    <p class="pt-1 pl-2">Agregar suscripción</p>
-                    <el-select v-model="form.status" clearable
-                        placeholder="Seleccione" no-data-text="No hay opciones registradas"
-                        no-match-text="No se encontraron coincidencias">
-                        <el-option v-for="item in paymentValidations" :key="item" :label="item" :value="item" />
-                    </el-select>
-                    <el-select :disabled="form.status == 'Rechazado'" v-model="form.suscription" clearable
-                        placeholder="Seleccione" no-data-text="No hay opciones registradas"
-                        no-match-text="No se encontraron coincidencias">
-                        <el-option v-for="item in suscriptions" :key="item" :label="item" :value="item" />
-                    </el-select>
-                    <InputError :message="form.errors.status" />
-                    <InputError :message="form.errors.suscription" />
-                    <div v-if="form.status === 'Rechazado'" class="col-span-full">
-                        <p class="pt-1">Motivo:</p>
-                        <el-input v-model="form.rejected_reason" :autosize="{ minRows: 3, maxRows: 5 }" type="textarea"
-                        placeholder="Ej. El ticket no es válido por..." :maxlength="500" show-word-limit clearable />
+                    <div class="mt-2 grid grid-cols-3 gap-x-3">
+                        <p class="font-bold">Contacto:</p>
+                        <p class="font-bold">Teléfono:</p>
+                        <p class="font-bold">Correo:</p>
+                        <p class="">{{ storeSelected.contact_name }}</p>
+                        <p class="">{{ storeSelected.contact_phone }}</p>
+                        <p class="">{{ storeSelected.user?.email ?? '-' }}</p>
                     </div>
                 </div>
-            </div>
 
-          <div class="col-span-full mt-2">
-            <InputLabel value="Comentarios:" class="!text-sm ml-2" />
-            <el-input v-model="form.notes" :autosize="{ minRows: 3, maxRows: 5 }" type="textarea"
-              placeholder="Escribe tus notas" :maxlength="500" show-word-limit clearable />
-          </div>
-          <div class="flex justify-end space-x-1 pt-2 pb-1 py-2 col-span-full">
-            <PrimaryButton :disabled="form.processing">Confirmar</PrimaryButton>
-          </div>
-        </form>
-      </div>
+                <div class="mx-3 col-span-full">
+                    <h2 class="font-bold">Información de la suscripción</h2>
+
+                    <div class="mt-3">
+                        <p class="font-bold">Fecha de suscripción:</p>
+                        <p class="">{{ formatDateTime(storeSelected.created_at) }}</p>
+                        <p class="font-bold pt-1">Tipo de suscripción:</p>
+                        <p class="">{{ storeSelected.suscription_period }}</p>
+                        <p class="font-bold pt-1">Comprobante de pago:</p>
+                        <div class="grid grid-cols-2 gap-2" v-if="storeSelected.last_payment?.media?.length > 0">
+                            <FileView v-for="file in storeSelected.last_payment?.media"
+                                :url="changeDomain(storeSelected.last_payment?.media[0].original_url)" :key="file" :file="file" />
+                        </div>
+                        <p v-else class=" text-gray-400 text-xs">No hay archivos adjuntos</p>
+                    </div>
+                    <div class="grid grid-cols-2 col-span-full gap-x-4 mt-2">
+                        <p class="pt-1 pl-2">Validación de pago:<i class="ml-2 text-xs"
+                                :class="getValidationIcon()"></i>
+                        </p>
+                        <p class="pt-1 pl-2">Agregar suscripción</p>
+                        <el-select v-model="form.status" clearable placeholder="Seleccione"
+                            no-data-text="No hay opciones registradas" no-match-text="No se encontraron coincidencias">
+                            <el-option v-for="item in paymentValidations" :key="item" :label="item" :value="item" />
+                        </el-select>
+                        <el-select :disabled="form.status == 'Rechazado'" v-model="form.suscription" clearable
+                            placeholder="Seleccione" no-data-text="No hay opciones registradas"
+                            no-match-text="No se encontraron coincidencias">
+                            <el-option v-for="item in suscriptions" :key="item" :label="item" :value="item" />
+                        </el-select>
+                        <InputError :message="form.errors.status" />
+                        <InputError :message="form.errors.suscription" />
+                        <div v-if="form.status === 'Rechazado'" class="col-span-full">
+                            <p class="pt-1">Motivo:</p>
+                            <el-input v-model="form.rejected_reason" :autosize="{ minRows: 3, maxRows: 5 }"
+                                type="textarea" placeholder="Ej. El ticket no es válido por..." :maxlength="500"
+                                show-word-limit clearable />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-full mt-2">
+                    <InputLabel value="Comentarios:" class="!text-sm ml-2" />
+                    <el-input v-model="form.notes" :autosize="{ minRows: 3, maxRows: 5 }" type="textarea"
+                        placeholder="Escribe tus notas" :maxlength="500" show-word-limit clearable />
+                </div>
+                <div class="flex justify-end space-x-1 pt-2 pb-1 py-2 col-span-full">
+                    <PrimaryButton :disabled="form.processing">Confirmar</PrimaryButton>
+                </div>
+            </form>
+        </div>
     </Modal>
     <!-- --------------------------- Modal detalles de suscripción (tienda) ends ------------------------------------ -->
 
     <!-- -------------- Modal detalles de suscripción (tienda) starts----------------------- -->
     <Modal :show="asignSellerModal" @close="asignSellerModal = false">
-      <div class="p-4 relative">
-        <i @click="asignSellerModal = false"
-          class="fa-solid fa-xmark text-xs cursor-pointer size-7 flex items-center justify-center absolute right-3"></i>
-        <h2 class="font-bold ml-4">Asignar vendedor</h2>
+        <div class="p-4 relative">
+            <i @click="asignSellerModal = false"
+                class="fa-solid fa-xmark text-xs cursor-pointer size-7 flex items-center justify-center absolute right-3"></i>
+            <h2 class="font-bold ml-4">Asignar vendedor</h2>
 
-        <div class="mt-3">
-            <InputLabel value="Responsable" class="ml-3 mb-1" />
-            <el-select v-model="asignedSeller" clearable
-                placeholder="Seleccione" no-data-text="No hay opciones registradas"
-                no-match-text="No se encontraron coincidencias">
-                <el-option v-for="item in sellers" :key="item" :label="item.label" :value="item.value" />
-            </el-select>
-        </div>
+            <div class="mt-3">
+                <InputLabel value="Responsable" class="ml-3 mb-1" />
+                <el-select v-model="asignedSeller" clearable placeholder="Seleccione"
+                    no-data-text="No hay opciones registradas" no-match-text="No se encontraron coincidencias">
+                    <el-option v-for="item in sellers" :key="item" :label="item.label" :value="item.value" />
+                </el-select>
+            </div>
 
-        <div class="flex justify-end space-x-1 pt-2 pb-1 py-2 col-span-full">
-        <PrimaryButton @click="asignSeller" :disabled="form.processing">Asignar</PrimaryButton>
+            <div class="flex justify-end space-x-1 pt-2 pb-1 py-2 col-span-full">
+                <PrimaryButton @click="asignSeller" :disabled="form.processing">Asignar</PrimaryButton>
+            </div>
         </div>
-      </div>
     </Modal>
     <!-- --------------------------- Modal detalles de suscripción (tienda) ends ------------------------------------ -->
-          
+
     <ConfirmationModal :show="showDeleteConfirm" @close="showDeleteConfirm = false">
         <template #title>
             <h1>Eliminar suscripción</h1>
@@ -250,7 +255,7 @@ export default {
                 'Trimestral',
                 'Semestral',
                 'Anual'
-             ],
+            ],
         };
     },
     components: {
@@ -268,6 +273,19 @@ export default {
         sellers: Array,
     },
     methods: {
+        changeDomain(url) {
+            // en local no se hace ningun cambio de dominio
+            if (import.meta.env.VITE_APP_ENV == 'local') return url;
+
+            const oldDomain = 'https://admin.ezyventas.com';
+            const newDomain = 'https://ezyventas.com';
+
+            // Reemplaza el dominio antiguo con el nuevo
+            if (url.startsWith(oldDomain)) {
+                return url.replace(oldDomain, newDomain);
+            }
+            return url; // Si no coincide, devuelve la URL sin cambios
+        },
         prepareSuscriptionModal(store) {
             this.suscriptionDetailsModal = true;
             this.storeSelected = store;
@@ -313,31 +331,31 @@ export default {
             } else if (commandName == 'delete') {
                 this.showDeleteConfirm = true;
                 this.itemIdToDelete = itemId;
-            } else if ( commandName == 'seller' ) {
+            } else if (commandName == 'seller') {
                 this.storeId = itemId;
                 this.asignSellerModal = true;
             }
         },
-        getStatusIcon( status ) {
-            if ( status === 'Pagado' ) {
+        getStatusIcon(status) {
+            if (status === 'Pagado') {
                 return 'fa-solid fa-bolt text-green-400';
             } else {
                 return 'fa-solid fa-circle-exclamation text-red-600';
             }
         },
         getPaymentStatusIcon(status) {
-            if ( status === 'En revisión' ) {
+            if (status === 'En revisión') {
                 return 'fa-regular fa-clock text-amber-400';
-            } else if ( status === 'Aprobado' ) {
+            } else if (status === 'Aprobado') {
                 return 'fa-solid fa-check text-green-400';
-            } else if ( status === 'Rechazado' ) {
+            } else if (status === 'Rechazado') {
                 return 'fa-solid fa-x text-red-500';
             }
         },
         getValidationIcon() {
-            if ( this.form.status === 'Aprobado' ) {
+            if (this.form.status === 'Aprobado') {
                 return 'fa-solid fa-check text-green-400';
-            } else if ( this.form.status === 'Rechazado' ) {
+            } else if (this.form.status === 'Rechazado') {
                 return 'fa-solid fa-xmark text-red-500';
             }
             return 'fa-regular fa-clock text-amber-400';
@@ -372,12 +390,12 @@ export default {
         // },
         async asignSeller() {
             try {
-                const response = await axios.put(route('stores.asign-seller', this.storeId), {sellerId: this.asignedSeller});
-                if ( response.status == 200 ) {
+                const response = await axios.put(route('stores.asign-seller', this.storeId), { sellerId: this.asignedSeller });
+                if (response.status == 200) {
                     const storeIndex = this.items.findIndex(item => item.id == this.storeId);
 
                     //si se encuentra el index se actualiza la información de la tienda
-                    if ( storeIndex != -1 ) {
+                    if (storeIndex != -1) {
                         this.items[storeIndex] = response.data.item;
                     }
 

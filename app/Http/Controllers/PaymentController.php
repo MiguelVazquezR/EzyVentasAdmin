@@ -68,6 +68,22 @@ class PaymentController extends Controller
         //
     }
 
+    public function notifyFiscalDataError(Request $request, Payment $payment)
+    {
+        // marcar como Error en datos fiscales
+        $payment->invoice_status = 'Error en datos fiscales';
+        $payment->save();
+
+        // notificar a suscriptor de error
+        $title = "Error al emitir factura";
+        $description = "No pudimos emitir la factura del pago con folio #$payment->id debido a errores en los datos fiscales que registraste. Favor de subir una constancia de situación fiscal válida y actualizada";
+        if (app()->environment() === 'local') {
+            $url = 'http://localhost:8000/user/payments';
+        } else {
+            $url = 'https://ezyventas.com/user/payments';
+        }
+        $payment->store->user->notify(new StoreBasicNotification($title, $description, $url));
+    }
 
     public function destroy(Payment $payment)
     {
