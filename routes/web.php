@@ -9,9 +9,9 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\SettingHistoryController;
 use App\Http\Controllers\SupportReportController;
 use App\Http\Controllers\StoreController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Artisan;
 
 
 Route::redirect('/', 'login');
@@ -54,9 +54,10 @@ Route::put('stores-asign-seller/{store}', [StoreController::class, 'asignSeller'
 Route::resource('global-products', GlobalProductController::class)->middleware('auth');
 Route::get('global-products-search', [GlobalProductController::class, 'searchProduct'])->name('global-products.search')->middleware('auth');
 Route::post('global-products/update-with-media/{global_product}', [GlobalProductController::class, 'updateWithMedia'])->name('global-products.update-with-media')->middleware('auth');
-Route::get('global-products-get-by-page/{currentPage}', [GlobalProductController::class, 'getItemsByPage'])->name('global-products.get-by-page')->middleware('auth');
+Route::post('global-products-get-by-page/{currentPage}', [GlobalProductController::class, 'getItemsByPage'])->name('global-products.get-by-page')->middleware('auth');
 Route::get('global-products-fetch-product-info/{global_product_id}', [GlobalProductController::class, 'fetchProductInfo'])->name('global-products.fetch-info-product')->middleware('auth');
 Route::get('global-products-filter', [GlobalProductController::class, 'filter'])->name('global-products.filter')->middleware('auth');
+Route::get('global-products-fetch-for-type/{type}', [GlobalProductController::class, 'fetchForType'])->name('global-products.fetch-for-type')->middleware('auth');
 
 
 //categories routes--------------------------------------------------------------------------------------
@@ -83,6 +84,8 @@ Route::post('/comments', [CommentController::class, 'store'])->name('comments.st
 //---------------------------------------------------------------------------------------------------------
 Route::resource('payments', PaymentController::class)->middleware('auth');
 Route::put('payments/validate/{payment}', [PaymentController::class, 'validatePayment'])->name('payments.validate')->middleware('auth');
+Route::put('payments/notify-fiscal-data-error/{payment}', [PaymentController::class, 'notifyFiscalDataError'])->name('payments.notify-fiscal-data-error')->middleware('auth');
+Route::post('payments/store-invoice/{payment}', [PaymentController::class, 'storeInvoice'])->name('payments.store-invoice')->middleware('auth');
 
 
 //support-reports routes------------------------------------------------------------------------------------------  
@@ -92,3 +95,11 @@ Route::get('support-reports-get-by-page/{currentPage}', [SupportReportController
 Route::get('support-reports-get-matches/{query}', [SupportReportController::class, 'getMatches'])->name('support-reports.get-matches');
 Route::get('support-reports-get-by-page/{currentPage}', [SupportReportController::class, 'getItemsByPage'])->name('support-reports.get-by-page')->middleware('auth');
 Route::put('support-reports/change-status/{supportReport}/{status}', [SupportReportController::class, 'changeStatus'])->name('support-reports.change-status')->middleware('auth');
+
+Route::get('/clear-all', function () {
+    Artisan::call('cache:clear');
+    Artisan::call('config:clear');
+    Artisan::call('route:clear');
+    Artisan::call('view:clear');
+    return 'cleared.';
+});

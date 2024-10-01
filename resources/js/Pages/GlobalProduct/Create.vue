@@ -14,14 +14,14 @@
 
                 <div class="mt-3">
                     <div class="flex items-center justify-between">
-                        <InputLabel value="Categoría*" class="ml-3 mb-1" />
+                        <InputLabel value="Categoría" class="ml-3 mb-1" />
                         <button
                             @click="showCategoryFormModal = true" type="button"
                             class="rounded-full border border-primary size-4 flex items-center justify-center">
                             <i class="fa-solid fa-plus text-primary text-[9px]"></i>
                         </button>
                     </div>
-                    <el-select class="w-1/2" v-model="form.category_id" clearable
+                    <el-select class="w-1/2" v-model="form.category_id" filterable
                         placeholder="Seleccione" no-data-text="No hay opciones registradas"
                         no-match-text="No se encontraron coincidencias">
                         <el-option v-for="category in localCategories" :key="category" :label="category.name" :value="category.id" />
@@ -31,14 +31,14 @@
 
                 <div class="mt-3">
                     <div class="flex items-center justify-between">
-                        <InputLabel value="Marca*" class="ml-3 mb-1" />
+                        <InputLabel value="Marca" class="ml-3 mb-1" />
                         <button
                             @click="showBrandFormModal = true" type="button"
                             class="rounded-full border border-primary size-4 flex items-center justify-center">
                             <i class="fa-solid fa-plus text-primary text-[9px]"></i>
                         </button>
                     </div>
-                    <el-select class="w-1/2" v-model="form.brand_id" clearable
+                    <el-select class="w-1/2" v-model="form.brand_id" filterable
                         placeholder="Seleccione" no-data-text="No hay opciones registradas"
                         no-match-text="No se encontraron coincidencias">
                         <el-option v-for="brand in localBrands" :key="brand" :label="brand.name" :value="brand.id" />
@@ -55,6 +55,16 @@
                         </template>
                     </el-input>
                     <InputError :message="form.errors.public_price" />
+                </div>
+
+                <div class="mt-3">
+                    <InputLabel value="Tipo*" class="ml-3 mb-1" />
+                    <el-select class="w-1/2" v-model="form.type" filterable
+                        placeholder="Seleccione" no-data-text="No hay opciones registradas"
+                        no-match-text="No se encontraron coincidencias">
+                        <el-option v-for="type in types" :key="type" :label="type" :value="type" />
+                    </el-select>
+                    <InputError :message="form.errors.type" />
                 </div>
 
                 <div class="col-span-full mt-4">
@@ -137,6 +147,7 @@ export default {
         const form = useForm({
             name: null,
             category_id: null,
+            type: null, //tipo de producto (giro)
             brand_id: null,
             code: null,
             public_price: null,
@@ -159,6 +170,7 @@ export default {
             localBrands: this.brands,
             showCategoryFormModal: false, //muestra formulario para agregar categoría
             showBrandFormModal: false, //muestra formulario para agregar marca
+            types: ['Abarrotes/Supermercado','Papelería','Cerrajería','Ferretería','Farmacia']
         };
     },
     components: {
