@@ -90,7 +90,7 @@
                 <div v-if="getStoreCSF">
                     <p>
                         <span>Actualmente contamos con una constancia registrada. </span> <br>
-                        <a :href="getStoreCSF.original_url" target="_blank" class="text-primary">
+                        <a :href="changeDomain(getStoreCSF.original_url)" target="_blank" class="text-primary">
                             Ver contancia de situación fiscal
                         </a>
                     </p>
@@ -186,6 +186,19 @@ export default {
         },
     },
     methods: {
+        changeDomain(url) {
+            // en local no se hace ningun cambio de dominio
+            // if (import.meta.env.VITE_APP_ENV == 'local') return url;
+
+            const oldDomain = 'https://admin.ezyventas.com';
+            const newDomain = 'https://ezyventas.com';
+
+            // Reemplaza el dominio antiguo con el nuevo
+            if (url.startsWith(oldDomain)) {
+                return url.replace(oldDomain, newDomain);
+            }
+            return url; // Si no coincide, devuelve la URL sin cambios
+        },
         storeInvoice() {
             this.invoiceForm.post(route('payments.store-invoice', this.store.payments[this.selectedPaymentIndex]), {
                 onSuccess: () => {

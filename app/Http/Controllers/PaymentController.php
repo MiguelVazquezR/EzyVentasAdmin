@@ -78,9 +78,9 @@ class PaymentController extends Controller
         $title = "Error al emitir factura";
         $description = "No pudimos emitir la factura del pago con folio #$payment->id debido a errores en los datos fiscales que registraste. Favor de subir una constancia de situación fiscal válida y actualizada";
         if (app()->environment() === 'local') {
-            $url = 'http://localhost:8000/user/payments';
+            $url = 'http://localhost:8000/payments';
         } else {
-            $url = 'https://ezyventas.com/user/payments';
+            $url = 'https://ezyventas.com/payments';
         }
         $payment->store->user->notify(new StoreBasicNotification($title, $description, $url));
     }
