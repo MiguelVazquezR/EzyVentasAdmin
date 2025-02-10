@@ -27,6 +27,29 @@ class PaymentController extends Controller
         //
     }
 
+    public function storeInvoice(Request $request, Payment $payment)
+    {
+        // borrar factura anterior si es que la hay
+        if ($payment->getFirstMedia('invoice')) {
+            $payment->clearMediaCollection('invoice');
+        }
+
+        $payment->addAllMediaFromRequest()->each(fn($file) => $file->toMediaCollection('invoice'));
+
+        // marcar como factura enviada
+        $payment->invoice_status = 'Enviada';
+        $payment->save();
+
+        // notificar a suscriptor de factura emitida
+        $title = "Factura disponible";
+        $description = "La factura solicitada del pago con folio #$payment->id está lista para descargar.";
+        if (app()->environment() === 'local') {
+            $url = 'http://localhost:8000/payments';
+        } else {
+            $url = 'https://ezyventas.com/payments';
+        }
+        $payment->store->user->notify(new StoreBasicNotification($title, $description, $url));
+    }
 
     public function show(Payment $payment)
     {
@@ -45,6 +68,22 @@ class PaymentController extends Controller
         //
     }
 
+    public function notifyFiscalDataError(Request $request, Payment $payment)
+    {
+        // marcar como Error en datos fiscales
+        $payment->invoice_status = 'Error en datos fiscales';
+        $payment->save();
+
+        // notificar a suscriptor de error
+        $title = "Error al emitir factura";
+        $description = "No pudimos emitir la factura del pago con folio #$payment->id debido a errores en los datos fiscales que registraste. Favor de subir una constancia de situación fiscal válida y actualizada";
+        if (app()->environment() === 'local') {
+            $url = 'http://localhost:8000/payments';
+        } else {
+            $url = 'https://ezyventas.com/payments';
+        }
+        $payment->store->user->notify(new StoreBasicNotification($title, $description, $url));
+    }
 
     public function destroy(Payment $payment)
     {
@@ -68,10 +107,10 @@ class PaymentController extends Controller
         $store->suscription_period = $request->suscription;
         $store->save();
 
-        // notificar a cliente de validacion de pago
+        // notificar a suscriptor de validacion de pago
         $title = "Respuesta a pago registrado";
         $description = "La suscripción de \"$store->name\" ha sido aprobada y esta activa. <br> Ahora puedes seguir utilizando el sistema con total normalidad.";
-        if (app()->environment() === 'local'){
+        if (app()->environment() === 'local') {
             $url = 'http://localhost:8000/user/profile';
         } else {
             $url = 'https://ezyventas.com/user/profile';
