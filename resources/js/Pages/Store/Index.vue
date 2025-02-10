@@ -53,8 +53,6 @@
 
 <script>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import InputLabel from "@/Components/InputLabel.vue";
 import Loading from '@/Components/MyComponents/Loading.vue';
 import StoresTable from '@/Components/MyComponents/Store/StoresTable.vue';
 import axios from 'axios';
@@ -127,8 +125,6 @@ export default {
     },
     components: {
         AppLayout,
-        PrimaryButton,
-        InputLabel,
         Loading,
         StoresTable,
     },
@@ -217,21 +213,21 @@ export default {
                 this.loading = false;
             }
         },
-        async fetchItemsByPage() {
-            try {
-                this.loadingItems = true;
-                const response = await axios.get(route('stores.get-by-page', this.currentPage));
+        // async fetchItemsByPage() {
+        //     try {
+        //         this.loadingItems = true;
+        //         const response = await axios.get(route('stores.get-by-page', this.currentPage));
 
-                if (response.status === 200) {
-                    this.localStores = { ...this.localStores, ...response.data.items };
-                    this.currentPage++;
-                }
-            } catch (error) {
-                console.log(error)
-            } finally {
-                this.loadingItems = false;
-            }
-        },
+        //         if (response.status === 200) {
+        //             this.localStores = { ...this.localStores, ...response.data.items };
+        //             this.currentPage++;
+        //         }
+        //     } catch (error) {
+        //         console.log(error)
+        //     } finally {
+        //         this.loadingItems = false;
+        //     }
+        // },
     }
 }
 </script>
