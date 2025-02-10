@@ -1,8 +1,8 @@
 <template>
     <!-- sidebar -->
     <div class="h-screen hidden md:block shadow-lg relative z-10">
-        <i @click="small = false" v-if="small" class="fa-solid fa-angle-right text-center text-xs pt-[2px] text-white rounded-full size-5 bg-primary absolute top-24 -right-3 cursor-pointer hover:scale-125 transition-transform ease-linear duration-150"></i>
-        <i @click="small = true" v-else class="fa-solid fa-angle-left text-center text-xs pt-[2px] text-white rounded-full size-5 bg-primary absolute top-24 -right-3 cursor-pointer hover:scale-125 transition-transform ease-linear duration-150"></i>
+        <i @click="updateSideNavSize(false)" v-if="small" class="fa-solid fa-angle-right text-center text-xs pt-[2px] text-white rounded-full size-5 bg-primary absolute top-24 -right-3 cursor-pointer hover:scale-125 transition-transform ease-linear duration-150"></i>
+        <i @click="updateSideNavSize(true)" v-else class="fa-solid fa-angle-left text-center text-xs pt-[2px] text-white rounded-full size-5 bg-primary absolute top-24 -right-3 cursor-pointer hover:scale-125 transition-transform ease-linear duration-150"></i>
         <div class="bg-[#232323] h-full overflow-auto">
             <!-- Logo -->
             <div class="flex items-center justify-center mt-7">
@@ -84,6 +84,15 @@ export default {
                     icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="-0.855 -0.855 24 24" height="20" width="20" id="Receipt-Check--Streamline-Core"><desc>Receipt Check Streamline Icon: https://streamlinehq.com</desc><g id="receipt-check--shop-shopping-pay-payment-store-cash-bill-receipt-check-confirm"><path id="Vector" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="m4.378392857142857 11.145 3.184285714285714 2.3882142857142856 5.5725 -6.368571428571428" stroke-width="1.71"></path><path id="Vector_2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M19.105714285714285 0.7960714285714285H3.9803571428571427c-0.8445203357142856 0 -1.6544593285714284 0.33548679 -2.2516243499999997 0.9326613642857143C1.1315582185714284 2.3258978142857143 0.7960714285714285 3.1358368071428573 0.7960714285714285 3.9803571428571427v17.513571428571428L4.776428571428571 19.105714285714285l3.9803571428571427 2.3882142857142856L12.737142857142857 19.105714285714285l3.9803571428571427 2.3882142857142856V3.184285714285714c0 -0.6333862714285714 0.2515585714285714 -1.2408524571428572 0.6994283571428571 -1.6887222428571427C17.86479814285714 1.047685725 18.472359857142855 0.7960714285714285 19.105714285714285 0.7960714285714285c0.6333544285714285 0 1.2409161428571427 0.2516142964285714 1.6887859285714284 0.6994920428571428 0.4478697857142857 0.4478697857142857 0.6994283571428571 1.0553359714285713 0.6994283571428571 1.6887222428571427v5.5725h-4.776428571428571" stroke-width="1.71"></path></g></svg>',
                     route: route('stores.index'),
                     active: route().current('stores.*'),
+                    options: [],
+                    dropdown: false,
+                    show: true
+                },
+                {
+                    label: 'Cupones de descuento',
+                    icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-[22px]"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z" /></svg>',
+                    route: route('discount-tickets.index'),
+                    active: route().current('discount-tickets.*'),
                     options: [],
                     dropdown: false,
                     show: true
@@ -177,9 +186,17 @@ export default {
             },
             logout() {
                 this.$inertia.post(route('logout'));
+            },
+            updateSideNavSize(is_small) {
+                this.small = is_small;
+                localStorage.setItem('is_sidenav_small', is_small);
             }
     },
     mounted() {
+        const is_small = localStorage.getItem('is_sidenav_small');
+        if (is_small !== null) {
+            this.small = JSON.parse(is_small); // Convertirlo a booleano si es necesario
+        }
     }
 }
 </script>
