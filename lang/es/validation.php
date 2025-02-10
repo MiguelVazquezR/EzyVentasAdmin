@@ -143,5 +143,8 @@ return [
         'disabled_date' => 'fecha de baja',
         'disabled_reason' => 'motivo de baja',
         'type' => 'tipo',
+        'code' => 'código',
+        'discount_amount' => 'descuento',
+        'expired_date' => 'fecha de expiración',
     ],
 ];
