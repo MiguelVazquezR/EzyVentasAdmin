@@ -146,5 +146,7 @@ return [
         'code' => 'código',
         'discount_amount' => 'descuento',
         'expired_date' => 'fecha de expiración',
+        'title' => 'título',
+        'youtube_id' => 'id de video youtube',
     ],
 ];

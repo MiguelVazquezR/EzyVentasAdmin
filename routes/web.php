@@ -10,6 +10,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\SettingHistoryController;
 use App\Http\Controllers\SupportReportController;
 use App\Http\Controllers\StoreController;
+use App\Http\Controllers\TutorialController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Artisan;
@@ -69,6 +70,11 @@ Route::resource('categories', CategoryController::class)->middleware('auth');
 //brands routes------------------------------------------------------------------------------------------  
 //-------------------------------------------------------------------------------------------------------
 Route::resource('brands', BrandController::class)->middleware('auth');
+
+
+//tutorials routes------------------------------------------------------------------------------------------  
+//-------------------------------------------------------------------------------------------------------
+Route::resource('tutorials', TutorialController::class)->middleware('auth');
 
 
 //setting history routes------------------------------------------------------------------------------------------  

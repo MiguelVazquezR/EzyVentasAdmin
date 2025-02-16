@@ -40,7 +40,7 @@
                         Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-secondary"></i>
                     </p>
                     <button
-                        v-else-if="!search && !filtered && (total_discount_tickets > 10 && localDiscountTickets?.length < total_discount_tickets)"
+                        v-else-if="!search && (total_discount_tickets > 10 && localDiscountTickets?.length < total_discount_tickets)"
                         @click="fetchItemsByPage"
                         class="w-full text-secondary my-4 text-xs mx-auto underline ml-6">Cargar más elementos</button>
                 </div>

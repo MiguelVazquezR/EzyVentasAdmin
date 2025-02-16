@@ -83,9 +83,6 @@ components:{
     Back
 
 },
-props:{
-    
-},
 methods:{
     store() {
         this.form.post(route("discount-tickets.store"), {
