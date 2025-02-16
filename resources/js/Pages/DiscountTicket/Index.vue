@@ -68,6 +68,7 @@ data() {
         total_discount_tickets: null,
         currentPage: 1, //para paginación
 
+
         //general
         loading: false,
         discountTicketsBuffer: [],

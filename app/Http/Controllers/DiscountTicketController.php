@@ -9,6 +9,7 @@ class DiscountTicketController extends Controller
 {
     public function index()
     {
+
         $discount_tickets = DiscountTicket::latest('id')->get()->take(30);
         $total_discount_tickets = DiscountTicket::all()->count();
 
@@ -75,6 +76,7 @@ class DiscountTicketController extends Controller
     public function getMatches($query)
     {
         $discount_tickets = DiscountTicket::latest('id')
+
             ->where('id', 'LIKE', "%$query%")
             ->orWhere('code', 'LIKE', "%$query%")
             ->orWhere('discount_amount', 'LIKE', "%$query%")
@@ -86,6 +88,7 @@ class DiscountTicketController extends Controller
     public function getItemsByPage($currentPage)
         {
             $offset = $currentPage * 30;
+
 
             $discount_tickets = DiscountTicket::latest('id')
                 ->get()
