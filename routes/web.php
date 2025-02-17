@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiscountTicketController;
 use App\Http\Controllers\GlobalProductController;
 use App\Http\Controllers\PaymentController;
@@ -109,6 +110,12 @@ Route::resource('support-reports', SupportReportController::class)->middleware('
 Route::get('support-reports-get-by-page/{currentPage}', [SupportReportController::class, 'getItemsByPage'])->name('support-reports.get-by-page')->middleware('auth');
 Route::get('support-reports-get-matches/{query}', [SupportReportController::class, 'getMatches'])->name('support-reports.get-matches');
 Route::put('support-reports/change-status/{supportReport}/{status}', [SupportReportController::class, 'changeStatus'])->name('support-reports.change-status')->middleware('auth');
+
+
+//dashboard routes ------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------
+Route::get('dashboard-fetch-data', [DashboardController::class, 'fetchDashboardData'])->middleware('auth')->name('dashboard.fetch-data');
+
 
 Route::get('/clear-all', function () {
     Artisan::call('cache:clear');
