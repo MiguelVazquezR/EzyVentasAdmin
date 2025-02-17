@@ -4,11 +4,14 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DiscountTicketController;
 use App\Http\Controllers\GlobalProductController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\SettingHistoryController;
 use App\Http\Controllers\SupportReportController;
 use App\Http\Controllers\StoreController;
+use App\Http\Controllers\TutorialController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Artisan;
@@ -70,6 +73,11 @@ Route::resource('categories', CategoryController::class)->middleware('auth');
 Route::resource('brands', BrandController::class)->middleware('auth');
 
 
+//tutorials routes------------------------------------------------------------------------------------------  
+//-------------------------------------------------------------------------------------------------------
+Route::resource('tutorials', TutorialController::class)->middleware('auth');
+
+
 //setting history routes------------------------------------------------------------------------------------------  
 //-------------------------------------------------------------------------------------------------------
 Route::get('setting-histories-get-by-store/{store}', [SettingHistoryController::class, 'getByStore'])->middleware('auth')->name('setting-histories.get-by-store');
@@ -88,13 +96,26 @@ Route::put('payments/notify-fiscal-data-error/{payment}', [PaymentController::cl
 Route::post('payments/store-invoice/{payment}', [PaymentController::class, 'storeInvoice'])->name('payments.store-invoice')->middleware('auth');
 
 
+//discount-tickets routes------------------------------------------------------------------------------------------  
+//---------------------------------------------------------------------------------------------------------
+Route::resource('discount-tickets', DiscountTicketController::class)->middleware('auth');
+Route::get('discount-tickets/{discount_ticket}/toggle-status', [DiscountTicketController::class, 'togglStatus'])->name('discount-tickets.toggle-status')->middleware('auth');
+Route::get('discount-tickets-get-by-page/{currentPage}', [DiscountTicketController::class, 'getItemsByPage'])->name('discount-tickets.get-by-page')->middleware('auth');
+Route::get('discount-tickets-get-matches/{query}', [DiscountTicketController::class, 'getMatches'])->name('discount-tickets.get-matches');
+
+
 //support-reports routes------------------------------------------------------------------------------------------  
 //---------------------------------------------------------------------------------------------------------
 Route::resource('support-reports', SupportReportController::class)->middleware('auth');
 Route::get('support-reports-get-by-page/{currentPage}', [SupportReportController::class, 'getItemsByPage'])->name('support-reports.get-by-page')->middleware('auth');
 Route::get('support-reports-get-matches/{query}', [SupportReportController::class, 'getMatches'])->name('support-reports.get-matches');
-Route::get('support-reports-get-by-page/{currentPage}', [SupportReportController::class, 'getItemsByPage'])->name('support-reports.get-by-page')->middleware('auth');
 Route::put('support-reports/change-status/{supportReport}/{status}', [SupportReportController::class, 'changeStatus'])->name('support-reports.change-status')->middleware('auth');
+
+
+//dashboard routes ------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------
+Route::get('dashboard-fetch-data', [DashboardController::class, 'fetchDashboardData'])->middleware('auth')->name('dashboard.fetch-data');
+
 
 Route::get('/clear-all', function () {
     Artisan::call('cache:clear');
