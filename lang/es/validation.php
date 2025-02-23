@@ -148,5 +148,9 @@ return [
         'expired_date' => 'fecha de expiración',
         'title' => 'título',
         'youtube_id' => 'id de video youtube',
+        'store_id' => 'tienda',
+        'payment_method' => 'método de pago',
+        'suscription_period' => 'periodo',
+        'amount' => 'monto',
     ],
 ];

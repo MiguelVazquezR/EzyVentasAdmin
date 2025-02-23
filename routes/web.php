@@ -49,7 +49,8 @@ Route::get('stores-get-matches/{query}', [StoreController::class, 'getMatches'])
 Route::get('stores-get-filters/{prop}/{value}', [StoreController::class, 'getFilters'])->name('stores.get-filters');
 Route::get('stores-get-settings-by-module/{store}/{module}', [StoreController::class, 'getSettingsByModule'])->middleware('auth')->name('stores.get-settings-by-module');
 Route::put('stores/toggle-setting-value/{store}/{setting_id}', [StoreController::class, 'toggleSettingValue'])->middleware('auth')->name('stores.toggle-setting-value');
-Route::put('stores-asign-seller/{store}', [StoreController::class, 'asignSeller'])->name('stores.asign-seller');
+Route::put('stores-asign-seller/{store}', [StoreController::class, 'asignSeller'])->name('stores.asign-seller')->middleware('auth');
+Route::put('stores-update-modules/{store}', [StoreController::class, 'updateModules'])->name('stores.update-modules')->middleware('auth');
 
 
 //Global products routes (Catálgo base)----------------------------------------------------------------------------------
@@ -94,6 +95,7 @@ Route::resource('payments', PaymentController::class)->middleware('auth');
 Route::put('payments/validate/{payment}', [PaymentController::class, 'validatePayment'])->name('payments.validate')->middleware('auth');
 Route::put('payments/notify-fiscal-data-error/{payment}', [PaymentController::class, 'notifyFiscalDataError'])->name('payments.notify-fiscal-data-error')->middleware('auth');
 Route::post('payments/store-invoice/{payment}', [PaymentController::class, 'storeInvoice'])->name('payments.store-invoice')->middleware('auth');
+Route::get('payments-get-by-page/{currentPage}', [PaymentController::class, 'getItemsByPage'])->name('payments.get-by-page')->middleware('auth');
 
 
 //discount-tickets routes------------------------------------------------------------------------------------------  

@@ -39,6 +39,7 @@ const submit = () => {
     <AuthenticationCard>
         <template #logo>
             <AuthenticationCardLogo />
+            <h1 class="text-center font-bold">ADMINISTRADOR</h1>
         </template>
 
         <div class="flex items-center justify-around mt-5 mb-8 mx-11 border-b text-sm">

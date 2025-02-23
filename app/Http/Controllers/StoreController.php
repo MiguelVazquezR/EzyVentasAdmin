@@ -158,4 +158,22 @@ class StoreController extends Controller
         // Devolver la respuesta con el modelo actualizado y la relación cargada
         return response()->json(['item' => $store]);
     }
+
+    public function updateModules(Request $request, Store $store)
+    {
+        $request->validate([
+            'modules' => 'required|array',
+            'modules.*' => 'string|in:Punto de venta,Reportes,Ventas registradas,Caja,Productos,Configuraciones,Clientes,Gastos,Cotizaciones,Renta de productos,Tienda en línea,Servicios',
+        ]);
+
+        if (!$store) {
+            return response()->json(['message' => 'Tienda no encontrada'], 404);
+        }
+
+        $store->activated_modules = $request->modules;
+        $store->save();
+
+        return response()->json(['message' => 'Módulos actualizados correctamente']);
+    }
+
 }

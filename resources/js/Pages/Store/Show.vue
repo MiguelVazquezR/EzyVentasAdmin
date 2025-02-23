@@ -33,7 +33,10 @@
                     <el-tab-pane label="Información general" name="1">
                         <GeneralStoreInfo :item="store" />
                     </el-tab-pane>
-                    <el-tab-pane label="Historial de pagos" name="2">
+                    <el-tab-pane label="Módulos activos" name="2">
+                        <ActivatedModules :store="store" />
+                    </el-tab-pane>
+                    <el-tab-pane label="Historial de pagos" name="3">
                         <PaymentsHistory :store="store" />
                     </el-tab-pane>
                 </el-tabs>
@@ -49,8 +52,8 @@ import InputLabel from "@/Components/InputLabel.vue";
 import Loading from '@/Components/MyComponents/Loading.vue';
 import GeneralStoreInfo from '@/Pages/Store/Tabs/GeneralStoreInfo.vue';
 import PaymentsHistory from '@/Pages/Store/Tabs/PaymentsHistory.vue';
+import ActivatedModules from '@/Pages/Store/Tabs/ActivatedModules.vue';
 import Back from "@/Components/MyComponents/Back.vue";
-import axios from 'axios';
 
 export default {
     data() {
@@ -62,6 +65,7 @@ export default {
     components: {
         AppLayout,
         GeneralStoreInfo,
+        ActivatedModules,
         PaymentsHistory,
         PrimaryButton,
         InputLabel,
