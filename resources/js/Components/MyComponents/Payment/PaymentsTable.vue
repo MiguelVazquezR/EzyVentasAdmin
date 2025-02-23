@@ -3,27 +3,24 @@
         <thead>
             <tr class="*:text-left *:pb-2 *:px-4 *:text-sm">
                 <th>ID</th>
-                <th>Código</th>
-                <th>Descuento</th>
-                <th>Creado el</th>
-                <th>Expiración</th>
+                <th>Metodo de pago</th>
+                <th>Periodo</th>
+                <th>Monto</th>
+                <th>Tienda</th>
                 <th>Estatus</th>
-                <th>Veces utilizado</th>
+                <th>Fecha de pago</th>
             </tr>
         </thead>
         <tbody>
             <tr v-for="item in items" :key="item.id"
                 class="*:text-xs *:py-2 *:px-4 hover:bg-primarylight">
                 <td class="rounded-s-full">{{ item.id }}</td>
-                <td>{{ item.code }}</td>
-                <td v-if="item.is_percentage_discount">{{ item.discount_amount }}%</td>
-                <td v-else>${{ item.discount_amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",") }}</td>
+                <td>{{ item.payment_method }}</td>
+                <td>{{ item.suscription_period }}</td>
+                <td>${{ item.amount?.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",") }}</td>
+                <td>{{ item.store?.name }}</td>
+                <td>{{ item.status }}</td>
                 <td>{{ formatDateTime(item.created_at) ?? '-' }}</td>
-                <td>{{ formatDateTime(item.expired_date) ?? '-' }}</td>
-                <td>
-                    <span class="py-1 px-3 rounded-md" :class="item.is_active ? 'text-green-500 bg-green-100' : 'text-red-600 bg-red-100'">{{ item.is_active ? 'Activo' : 'Inactivo' }}</span>
-                </td>
-                <td>{{ item.times_used ?? '0' }}</td>
                 <td class="rounded-e-full text-end">
                     <el-dropdown trigger="click" @command="handleCommand">
                         <button @click.stop
@@ -39,16 +36,6 @@
                                             d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
                                     </svg>
                                     <span class="text-xs">Editar</span>
-                                </el-dropdown-item>
-                                <el-dropdown-item :command="'toogleStatus-' + item.id">
-                                    <svg v-if="item.is_active" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-[14px] mr-2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
-                                    </svg>
-
-                                    <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-[14px] mr-2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                    </svg>
-                                    <span class="text-xs">{{ item.is_active ? 'Deshabilitar' : 'Habilitar' }}</span>
                                 </el-dropdown-item>
                                 <el-dropdown-item :command="'delete-' + item.id">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -70,10 +57,10 @@
     <!-- Delete confirm modal -->
     <ConfirmationModal :show="showDeleteConfirm" @close="showDeleteConfirm = false">
         <template #title>
-            <h1>Eliminar cupón de descuento</h1>
+            <h1>Eliminar registro de pago</h1>
         </template>
         <template #content>
-            <p>Se eliminará el cupón de descuento. Es un proceso irreversible. ¿Continuar de
+            <p>Se eliminará el registro de pago. Es un proceso irreversible. ¿Continuar de
                 todas formas?</p>
         </template>
         <template #footer>
@@ -101,9 +88,9 @@ data() {
     }
 },
 components:{
+    CancelButton,
     ConfirmationModal,
     DangerButton,
-    CancelButton
 },
 props: {
     items: Array,
@@ -120,40 +107,15 @@ methods:{
         const itemId = command.split('-')[1];
 
         if (commandName == 'edit') {
-            this.$inertia.get(route('discount-tickets.edit', itemId));
-        } else if (commandName == 'toogleStatus') {
-            this.toogleStatus(itemId);
+            this.$inertia.get(route('payments.edit', itemId));
         } else if (commandName == 'delete') {
             this.itemIdToDelete = itemId;
             this.showDeleteConfirm = true;
         }
     },
-    async toogleStatus(itemId) {
-        try {
-            const response = await axios.get(route('discount-tickets.toggle-status', itemId));
-            if ( response.status === 200 ) {
-                //hace toogle en el status del cupón
-                const itemToUpdate = this.items.find(item => item.id == itemId);
-                itemToUpdate.is_active = !itemToUpdate.is_active;
-
-                this.$notify({
-                    title: "Correcto",
-                    message: "",
-                    type: "success",
-                });
-            }
-        } catch (error) {
-            console.log(error);
-            this.$notify({
-                title: "Error",
-                message: "No se pudo cambiar el estatus del cupón. Inténtalo de nuevo",
-                type: "error",
-            });
-        }
-    },
     async deleteItem() {
         try {
-            const response = await axios.delete(route('discount-tickets.destroy', this.itemIdToDelete));
+            const response = await axios.delete(route('payments.destroy', this.itemIdToDelete));
             if ( response.status === 200 ) {
                 //buscar el index del item eliminado
                 const itemToDeleteIndex = this.items.findIndex(item => item.id == this.itemIdToDelete);

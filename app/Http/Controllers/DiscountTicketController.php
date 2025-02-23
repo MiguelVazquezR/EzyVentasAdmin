@@ -10,7 +10,7 @@ class DiscountTicketController extends Controller
     public function index()
     {
 
-        $discount_tickets = DiscountTicket::latest('id')->get()->take(30);
+        $discount_tickets = DiscountTicket::latest('id')->get()->take(50);
         $total_discount_tickets = DiscountTicket::all()->count();
 
         return inertia('DiscountTicket/Index', compact('discount_tickets', 'total_discount_tickets'));
@@ -63,7 +63,7 @@ class DiscountTicketController extends Controller
 
     public function destroy(DiscountTicket $discount_ticket)
     {
-        //
+        $discount_ticket->delete();
     }
 
     public function togglStatus(DiscountTicket $discount_ticket)
@@ -86,15 +86,15 @@ class DiscountTicketController extends Controller
     }
 
     public function getItemsByPage($currentPage)
-        {
-            $offset = $currentPage * 30;
+    {
+        $offset = $currentPage * 50;
 
 
-            $discount_tickets = DiscountTicket::latest('id')
-                ->get()
-                ->skip($offset)
-                ->take(30);
+        $discount_tickets = DiscountTicket::latest('id')
+            ->get()
+            ->skip($offset)
+            ->take(50);
 
-            return response()->json(['items' => $discount_tickets]);
-        }
+        return response()->json(['items' => $discount_tickets]);
+    }
 }
