@@ -59,6 +59,6 @@ class TutorialController extends Controller
 
     public function destroy(Tutorial $tutorial)
     {
-        //
+        $tutorial->delete();
     }
 }

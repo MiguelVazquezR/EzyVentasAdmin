@@ -40,7 +40,7 @@
                         Cargando <i class="fa-sharp fa-solid fa-circle-notch fa-spin ml-2 text-secondary"></i>
                     </p>
                     <button
-                        v-else-if="!search && (total_discount_tickets > 10 && localDiscountTickets?.length < total_discount_tickets)"
+                        v-else-if="!search && (total_discount_tickets > 50 && localDiscountTickets?.length < total_discount_tickets)"
                         @click="fetchItemsByPage"
                         class="w-full text-secondary my-4 text-xs mx-auto underline ml-6">Cargar más elementos</button>
                 </div>
@@ -65,7 +65,7 @@ data() {
 
         //table
         localDiscountTickets: this.discount_tickets,
-        total_discount_tickets: null,
+        loadingItems: false,
         currentPage: 1, //para paginación
 
 
@@ -108,7 +108,7 @@ methods:{
     async fetchItemsByPage() {
             try {
                 this.loadingItems = true;
-                const response = await axios.get(route('discuount-tickets.get-by-page', this.currentPage));
+                const response = await axios.get(route('discount-tickets.get-by-page', this.currentPage));
 
                 if (response.status === 200) {
                     this.localDiscountTickets = [...this.localDiscountTickets, ...response.data.items];

@@ -94,6 +94,7 @@ Route::resource('payments', PaymentController::class)->middleware('auth');
 Route::put('payments/validate/{payment}', [PaymentController::class, 'validatePayment'])->name('payments.validate')->middleware('auth');
 Route::put('payments/notify-fiscal-data-error/{payment}', [PaymentController::class, 'notifyFiscalDataError'])->name('payments.notify-fiscal-data-error')->middleware('auth');
 Route::post('payments/store-invoice/{payment}', [PaymentController::class, 'storeInvoice'])->name('payments.store-invoice')->middleware('auth');
+Route::get('payments-get-by-page/{currentPage}', [PaymentController::class, 'getItemsByPage'])->name('payments.get-by-page')->middleware('auth');
 
 
 //discount-tickets routes------------------------------------------------------------------------------------------  
