@@ -81,6 +81,7 @@ class DashboardController extends Controller
             ->where('status', 'Aprobado')
             ->sum('amount');
 
+        // periodos de tiendas
         $subscriptionPlans = DB::table('stores')
             ->selectRaw("CASE 
                             WHEN suscription_period = 'Mensual' THEN 'Mensual' 
@@ -98,10 +99,26 @@ class DashboardController extends Controller
             ->pluck('total', 'plan')
             ->toArray();
         
-        
-        
         $responseData['subscriptionPlansData'] = array_values($subscriptionPlans);
         $responseData['subscriptionPlansLabels'] = array_keys($subscriptionPlans);
+
+        // Subscriptores nuevos (tiendas)
+        $storesPerMonth = DB::table('stores')
+            ->selectRaw('MONTH(created_at) as month, COUNT(*) as total')
+            ->whereYear('created_at', $year) // Usa el año seleccionado
+            ->groupBy('month')
+            ->orderBy('month')
+            ->pluck('total', 'month')
+            ->toArray();
+
+        $months2 = [
+            1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril', 5 => 'Mayo', 6 => 'Junio',
+            7 => 'Julio', 8 => 'Agosto', 9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
+        ];
+
+        $responseData['storesPerMonthData'] = array_values($storesPerMonth);
+        $responseData['storesPerMonthLabels'] = array_map(fn($m) => $months2[$m], array_keys($storesPerMonth));
+
         
         return response()->json([
             'storeCount' => $storeCount,
@@ -119,6 +136,8 @@ class DashboardController extends Controller
             'totalCompanyRevenue' => $totalCompanyRevenue,
             'subscriptionPlansData' => $responseData['subscriptionPlansData'],
             'subscriptionPlansLabels' => $responseData['subscriptionPlansLabels'],
+            'storesPerMonthData' => $responseData['storesPerMonthData'],
+            'storesPerMonthLabels' => $responseData['storesPerMonthLabels'],
         ]);
     }
 }

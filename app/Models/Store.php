@@ -27,10 +27,12 @@ class Store extends Model implements HasMedia
         'seller_id',
         'suscription_period',
         'default_card_id',
+        'activated_modules',
     ];
 
     protected $casts = [
         'next_payment' => 'date',
+        'activated_modules' => 'array',
     ];
 
     //relationships

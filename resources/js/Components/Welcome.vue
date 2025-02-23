@@ -31,6 +31,7 @@
       <h1 class="col-span-full text-lg ml-4 font-bold">General</h1>
       <apexchart type="bar" :options="revenueChartOptions" :series="revenueSeries" class="chart" />
       <apexchart type="bar" :options="reportsChartOptions" :series="reportsSeries" class="chart" />
+      <apexchart type="bar" :options="storesPerMonthOptions" :series="storesPerMonthSeries" class="chart" />
       <apexchart type="pie" :options="storesChartOptions" :series="storesSeries" class="chart" />
       <apexchart type="pie" :options="subscriptionPlansOptions" :series="subscriptionPlansSeries" class="chart" />
     </div>
@@ -212,6 +213,18 @@ export default {
           dataLabels: { enabled: true },
           colors: ["#FF6384", "#36A2EB"],
         },
+        storesPerMonthSeries: [{ name: "Tiendas Nuevas", data: [] }],
+        storesPerMonthOptions: {
+          chart: { type: "bar" },
+          xaxis: { categories: [] },
+          title: { 
+            text: "Tiendas Nuevas Registradas en " + this.selectedYear, 
+            align: "center", 
+            style: { fontSize: '18px', fontWeight: 'bold', color: '#333' }
+          },
+          colors: ["#4CAF50"],
+          dataLabels: { enabled: true },
+        },
     };
   },
   mounted() {
@@ -241,7 +254,9 @@ export default {
         this.revenueChartOptions.xaxis.categories = data.months.length ? data.months : ["Enero"];
         this.subscriptionPlansSeries = data.subscriptionPlansData;
         this.subscriptionPlansOptions.labels = data.subscriptionPlansLabels;
-        console.log(data);
+        this.storesPerMonthSeries[0].data = data.storesPerMonthData;
+        this.storesPerMonthOptions.xaxis.categories = data.storesPerMonthLabels;
+        this.storesPerMonthOptions.title.text = "Tiendas Nuevas Registradas en " + this.selectedYear;
       } catch (error) {
         console.error("Error al cargar datos del dashboard", error);
       } finally {
