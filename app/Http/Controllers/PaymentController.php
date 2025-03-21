@@ -216,8 +216,9 @@ class PaymentController extends Controller
 
         //obtiene la tienda a la cual se hizo el pago para guarda el periodo pagado
         $store = Store::find($payment->store_id);
-
         $store->suscription_period = $request->suscription;
+        $store->is_active = 1;
+        $store->status = 'Pagado';
         $store->save();
 
         // notificar a suscriptor de validacion de pago
