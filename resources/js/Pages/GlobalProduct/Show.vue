@@ -5,15 +5,16 @@
             <div class="flex justify-between items-center mx-3">
                 <h1 class="font-bold text-lg">Catálogo base</h1>
                 <div class="flex items-center space-x-3 my-2 lg:my-0">
-                    <PrimaryButton @click="$inertia.get(route('global-products.edit', global_product.id))" class="!rounded-full">Editar</PrimaryButton>
+                    <PrimaryButton @click="$inertia.get(route('global-products.edit', global_product.id))"
+                        class="!rounded-full">Editar</PrimaryButton>
                 </div>
             </div>
 
             <!-- selector de producto global -->
             <div class="md:w-1/3 mt-2">
-                <el-select @change="$inertia.get(route('global-products.show', global_product_id))" v-model="global_product_id" clearable
-                    placeholder="Seleccione" no-data-text="No hay opciones registradas"
-                    no-match-text="No se encontraron coincidencias">
+                <el-select @change="$inertia.get(route('global-products.show', global_product_id))"
+                    v-model="global_product_id" clearable placeholder="Seleccione"
+                    no-data-text="No hay opciones registradas" no-match-text="No se encontraron coincidencias">
                     <el-option v-for="item in global_products" :key="item" :label="item.name" :value="item.id" />
                 </el-select>
             </div>
@@ -26,8 +27,14 @@
             <div class="lg:grid grid-cols-3 gap-x-12 mx-10">
                 <!-- fotografia de producto -->
                 <section class="mt-7">
-                    <figure class="border border-grayD9 rounded-lg">
-                        <img class="size-60 lg:size-96 mx-auto object-contain" :src="procesarUrlImagen(global_product.media[0]?.original_url)" alt="">
+                    <figure class="border border-grayD9 rounded-lg flex items-center justify-center">
+                        <img v-if="global_product.media.length" class="size-60 lg:size-96 mx-auto object-contain"
+                            :src="procesarUrlImagen(global_product.media[0]?.original_url)">
+                        <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="size-56 text-gray-300">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                        </svg>
                     </figure>
                 </section>
 
@@ -63,12 +70,15 @@
                                     </el-tooltip>
                                 </p>
                                 <i class="fa-solid fa-circle text-[7px] text-[#9A9A9A]"></i>
-                                <p class="text-gray37">Categoría: <span class="font-bold">{{ global_product.category?.name }}</span></p>
+                                <p class="text-gray37">Categoría: <span class="font-bold">{{
+                                    global_product.category?.name }}</span></p>
                                 <i class="fa-solid fa-circle text-[7px] text-[#9A9A9A]"></i>
-                                <p class="text-gray37">Marca: <span class="font-bold">{{ global_product.brand?.name }}</span></p>
+                                <p class="text-gray37">Marca: <span class="font-bold">{{ global_product.brand?.name
+                                }}</span></p>
                             </div>
                         </div>
-                            <p class="text-gray37 mt-3">Fecha de alta: <strong class="ml-5">{{ formatDate(global_product.created_at)}}</strong></p>
+                        <p class="text-gray37 mt-3">Fecha de alta: <strong class="ml-5">{{
+                            formatDate(global_product.created_at) }}</strong></p>
                         <h1 class="font-bold text-lg lg:text-xl my-2 lg:my-4">{{ global_product.name }}</h1>
 
                         <div class="lg:w-1/2 mt-3 lg:mt-10 -ml-7 space-y-2">
@@ -93,23 +103,23 @@ import { format, parseISO } from 'date-fns';
 import es from 'date-fns/locale/es';
 
 export default {
-data() {
-    return {
-        global_product_id: null,
-        currentTab: 1,
-    }
-},
-components:{
-AppLayout,
-PrimaryButton,
-Back
-},
-props:{
-global_product: Object,
-global_products: Array
-},
-methods:{
-    copyToClipboard() {
+    data() {
+        return {
+            global_product_id: null,
+            currentTab: 1,
+        }
+    },
+    components: {
+        AppLayout,
+        PrimaryButton,
+        Back
+    },
+    props: {
+        global_product: Object,
+        global_products: Array
+    },
+    methods: {
+        copyToClipboard() {
             const textToCopy = this.global_product.code;
 
             // Create a temporary input element
@@ -133,7 +143,7 @@ methods:{
             });
         },
         formatDate(dateString) {
-            return format(parseISO(dateString), 'dd MMMM yyyy', { locale: es });
+            return format(parseISO(dateString), 'dd MMMM yyyy', { locale: es });
         },
         // Método para procesar la URL de la imagen manda a la ruta de la app.
         procesarUrlImagen(originalUrl) {
@@ -142,6 +152,6 @@ methods:{
             // const nuevaUrl = originalUrl.replace('http://localhost:8000', 'https://ezyventas.com/'); //para hacer pruebas en local
             return nuevaUrl;
         },
-}
+    }
 }
 </script>
